@@ -5,3 +5,189 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum UserRoles {
+  ADMIN
+  SUPERADMIN
+  TEACHER
+  ASSISTANT
+  STUDENT
+}
+
+enum Courselevel {
+  BEGINNER
+  ELEMENTARY
+  PRE_INTERMIDIATE
+  INTERMIDIATE
+}
+
+enum Variants {
+  variantA
+  variantB
+  variantC
+  variantD
+}
+
+model Users {
+  id Int @id @default(autoincrement())
+  full_name String
+  phone_number String @unique
+  email String?
+  password String
+  role  UserRoles
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  mentorProiles MentorProfile[]
+
+  @@map("users")
+  courses Courses[]
+}
+
+model MentorProfile {
+    id  Int @id @default(autoincrement())
+    experience Float
+    user_id Int
+    job String?
+    web_link String?
+    description String?
+    facebook String?
+    telegram String?
+    linkedIn String?
+    instagram String?
+    github String?
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    @@map("mentor_profile")
+
+    user Users @relation(fields: [user_id] , references: [id])
+
+    courses Courses[]
+}
+
+model Categories  {
+  id Int @id @default(autoincrement())
+  name String @unique
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  courses Courses[]
+
+  @@map("categories")
+}
+
+model Courses {
+  id Int @id @default(autoincrement())
+  assistant_id Int?
+  mentor_id Int
+  banner String
+  intro_video String?
+  name String @unique
+  description String
+  prize  Decimal
+  level Courselevel 
+  category_id Int
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  @@map("courses")
+
+  category Categories @relation(fields: [category_id], references: [id])
+  user Users? @relation(fields: [assistant_id] , references: [id])
+  mentorProile MentorProfile @relation(fields: [mentor_id] , references: [id])
+  sections Section[]
+}
+
+model Section {
+  id Int @id @default(autoincrement())
+  name String
+  course_id Int
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  @@map("sections")
+  course Courses @relation(fields: [course_id] , references: [id])
+  lessons Lessons[]
+}
+
+model Lessons {
+  id Int @id @default(autoincrement())
+  section_id Int
+  name String
+  description String
+  video_file  String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  @@map("lessons")
+
+  section Section @relation(fields: [section_id] , references: [id])
+  homeWorks HomeWorks[]
+  exams Exams[]
+}
+
+model Material {
+  id Int @id @default(autoincrement())
+  lesson_id Int
+  description String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("materials")
+  materialFiles MaterialFile[]
+}
+
+model MaterialFile {
+  id Int @id @default(autoincrement())
+  material_id Int
+  file String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  @@map("materialFiles")
+  material Material @relation(fields: [material_id] , references: [id])
+}
+
+model HomeWorks {
+  id Int @id @default(autoincrement())
+  lesson_id Int
+  title String
+  file String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  lesson Lessons @relation(fields: [lesson_id] , references: [id])
+  @@map("homeWorks")
+  homeWorkFiles HomeWorkFiles[]
+}
+
+model HomeWorkFiles {
+  id Int @id @default(autoincrement())
+  homework_id Int
+  file String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("homeWorkFiles")
+
+  homework HomeWorks @relation(fields: [homework_id] , references: [id])
+}
+
+model Exams {
+  id Int @id @default(autoincrement())
+  lesson_id Int
+  question String
+  variantA String
+  variantB String
+  variantC String
+  variantD String
+
+  answer Variants
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("exams")
+  lesson Lessons @relation(fields: [lesson_id] , references: [id])
+}
