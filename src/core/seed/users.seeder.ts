@@ -28,5 +28,4 @@ export class UserSeeder implements OnModuleInit {
 
         Logger.log("✅ Superadmin created successfully")
     }
-
 }

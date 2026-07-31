@@ -9,4 +9,4 @@ import { PrismaModule } from "../database/prisma.module";
     exports:[UserSeeder]
 })
 
-export class SeederModule {}
+export class SeederModule {} 

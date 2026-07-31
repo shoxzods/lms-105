@@ -7,7 +7,7 @@ import config from "./common/config/swagger"
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes( new ValidationPipe({whitelist:true , transform:true}));
-
+  app.setGlobalPrefix("api/v1")
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
     
