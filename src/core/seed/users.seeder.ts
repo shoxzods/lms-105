@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { PrismaService } from "../database/prisma.service";
 import { UserRoles } from "@prisma/client";
+import hash from "../../common/config/hash"
 
 @Injectable()
 export class UserSeeder implements OnModuleInit {
@@ -19,7 +20,7 @@ export class UserSeeder implements OnModuleInit {
                 full_name:"Shoxzod Primov",
                 phone_number:"+998995507613",
                 email:"ranaldu456@gmail.com",
-                password:process.env.USER_PASSWORD as string,
+                password: await hash.HashingPassword(process.env.USER_PASSWORD as string),
                 role:UserRoles.SUPERADMIN 
               }
             }
