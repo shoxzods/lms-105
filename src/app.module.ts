@@ -6,6 +6,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthGuard } from './common/guards/auth.guard';
 import { UsersModule } from './modules/users/users.module';
+import { AdminsModule } from './modules/admins/admins.module';
+import { MentorModule } from './modules/mentor/mentor.module';
 
 
 @Module({
@@ -14,7 +16,7 @@ import { UsersModule } from './modules/users/users.module';
     JwtModule.register({global:true}), 
     PrismaModule, 
     SeederModule, 
-    AuthModule, UsersModule
+    AuthModule, UsersModule, AdminsModule, MentorModule
 ]})
 
 export class AppModule {} 
