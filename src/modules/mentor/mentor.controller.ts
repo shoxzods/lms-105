@@ -46,7 +46,7 @@ export class MentorController {
     @Roles(UserRoles.SUPERADMIN , UserRoles.ADMIN)
     @UseGuards(AuthGuard , RoleGuard)
     @Post('find')
-    async findUsersAdmins(@Query("name") name:string){
+    async findUsersmentors(@Query("name") name:string){
         const message = await this.mentorService.findUsersMentors(name);
 
         return message

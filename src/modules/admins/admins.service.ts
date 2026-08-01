@@ -102,7 +102,7 @@ export class AdminsService {
 
         try {
 
-        const user = await this.prisma.users.updateManyAndReturn({where:{id:id} , 
+        const user = await this.prisma.users.updateManyAndReturn({where:{id:id , role:"ADMIN"} , 
                 data:{
                     full_name:payload.full_name , 
                     phone_number:payload.phone_number , 
@@ -121,7 +121,7 @@ export class AdminsService {
         }
     } catch(err) {
         if(err instanceof Error) {
-            throw new BadRequestException("User with this email already exists")
+            throw new BadRequestException("User with this email or phone_number already exists")
         }
     }
     }

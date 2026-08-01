@@ -4,10 +4,10 @@ import { PrismaModule } from './core/database/prisma.module';
 import { SeederModule } from './core/seed/seeder.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
-import { AuthGuard } from './common/guards/auth.guard';
 import { UsersModule } from './modules/users/users.module';
 import { AdminsModule } from './modules/admins/admins.module';
 import { MentorModule } from './modules/mentor/mentor.module';
+import { AssistentModule } from './modules/assistent/assistent.module';
 
 
 @Module({
@@ -16,7 +16,7 @@ import { MentorModule } from './modules/mentor/mentor.module';
     JwtModule.register({global:true}), 
     PrismaModule, 
     SeederModule, 
-    AuthModule, UsersModule, AdminsModule, MentorModule
+    AuthModule, UsersModule, AdminsModule, MentorModule, AssistentModule
 ]})
 
 export class AppModule {} 
