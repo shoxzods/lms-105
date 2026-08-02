@@ -8,6 +8,7 @@ import { UsersModule } from './modules/users/users.module';
 import { AdminsModule } from './modules/admins/admins.module';
 import { MentorModule } from './modules/mentor/mentor.module';
 import { AssistentModule } from './modules/assistent/assistent.module';
+import { StudentsModule } from './modules/students/students.module';
 
 
 @Module({
@@ -16,7 +17,7 @@ import { AssistentModule } from './modules/assistent/assistent.module';
     JwtModule.register({global:true}), 
     PrismaModule, 
     SeederModule, 
-    AuthModule, UsersModule, AdminsModule, MentorModule, AssistentModule
+    AuthModule, UsersModule, AdminsModule, MentorModule, AssistentModule, StudentsModule
 ]})
 
 export class AppModule {} 

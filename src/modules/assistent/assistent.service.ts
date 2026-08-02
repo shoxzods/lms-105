@@ -14,7 +14,7 @@ export class AssistentService {
                                 .users
                                 .findUnique(
                                  {
-                                    where: { id:id } , 
+                                    where: { id:id , role:"ASSISTANT" } , 
                                     select: {
                                         id:true,
                                         full_name:true,
