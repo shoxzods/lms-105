@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lms-105-app
+    restart: always
+    ports:
+      - "4500:4000"
+    command: >
+      sh -c "
+        npx prisma generate &&
+        npx prisma migrate deploy &&
+        npm run start:prod
+      "
+    environment:
+      DATABASE_URL: "postgresql://postgres:1234@db:5432/lms_n105?schema=public"
+    depends_on:
+      - db
+
+  db:
+    image: postgres:17
+    container_name: lms-105
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: lms_n105
+    ports:
+      - "5430:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
