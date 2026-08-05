@@ -82,22 +82,22 @@ model Categories  {
 model Courses {
   id Int @id @default(autoincrement())
   assistant_id Int?
-  mentor_id Int
+  mentor_id Int?
   banner String
   intro_video String?
   name String @unique
   description String
   prize  Decimal
   level Courselevel 
-  category_id Int
+  category_id Int?
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   @@map("courses")
 
-  category Categories @relation(fields: [category_id], references: [id])
+  category Categories? @relation(fields: [category_id], references: [id])
   user Users? @relation(fields: [assistant_id] , references: [id])
-  mentorProile MentorProfile @relation(fields: [mentor_id] , references: [id])
+  mentorProile MentorProfile? @relation(fields: [mentor_id] , references: [id])
   sections Section[]
 }
 
