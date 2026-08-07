@@ -8,7 +8,7 @@ services:
     container_name: lms-105-app
     restart: always
     ports:
-      - "4500:4000"
+      - "4500:3000"
     command: >
       sh -c "
         npx prisma generate &&
@@ -17,6 +17,8 @@ services:
       "
     environment:
       DATABASE_URL: "postgresql://postgres:1234@db:5432/lms_n105?schema=public"
+    volumes:
+      - ./src/uploads:/app/src/uploads
     depends_on:
       - db
 

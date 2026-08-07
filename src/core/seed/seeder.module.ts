@@ -4,7 +4,7 @@ import { PrismaModule } from "../database/prisma.module";
 
 @Global()
 @Module({
-    imports:[PrismaModule],
+    imports:[PrismaModule ],
     providers:[UserSeeder],
     exports:[UserSeeder]
 })

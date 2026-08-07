@@ -23,7 +23,8 @@ export class UsersService {
                                         id:true
                                     }
                                 });
-        
+
+        const courses = await this.prisma.courses.count();
 
         const data = users.reduce((acc:{role:string , count:number}[] , user) => {
             acc.push({role:user.role , count:user._count.id})
@@ -33,7 +34,11 @@ export class UsersService {
 
         return {
             success:true,
-            data:data
+            data: 
+            {
+                users:data,
+                courses:courses
+            }
         }
     }
 }

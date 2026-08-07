@@ -13,6 +13,8 @@ RUN npm install
 # Копируем весь проект
 COPY . .
 
+RUN npx prisma generate
+
 # Собираем проект
 RUN npm run build
 
