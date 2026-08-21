@@ -33,7 +33,7 @@ export class AssistentService {
             }
         }
 
-       async getAllAssistants(page:number , limit:number) {
+        async getAllAssistants(page:number , limit:number) {
 
         const assistants = await this.prisma.users.findMany(
             {
@@ -59,22 +59,27 @@ export class AssistentService {
 
 
     async createUserAssistant(payloud:CreateAssistantDto) {
-       try {
+         const existCourse = await this.prisma.courses.findUnique({where:{id:payloud.courseId}});
 
+        if(!existCourse) {
+            throw new NotFoundException("course not found")
+        }
+
+    try {
         const hashedPassword = await hashing.HashingPassword(payloud.password);
+        const assistant = await this.prisma.users.create({data:{ full_name:payloud.full_name , phone_number:payloud.phone_number , password:hashedPassword, role:"ASSISTANT"}})
+        await this.prisma.courses.update({where:{id:payloud.courseId} , data:{assistant_id:assistant.id}});
 
-        await this.prisma.users.create({data:{ full_name:payloud.full_name , phone_number:payloud.phone_number , password:hashedPassword, role:"ASSISTANT" }})
-        
         return {
             success:true,
             message:"User created successfully"
         }
 
-        } catch(err) {
-            if(err instanceof Error) {
-               throw new ConflictException("User with this phone_number already exists")
-            }
+    } catch(err) {
+        if(err instanceof Error) {
+           throw new ConflictException("User with this phone_number already exists")
         }
+    }
     }
 
     async findUsersAssistant(name:string) {

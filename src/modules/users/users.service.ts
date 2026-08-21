@@ -1,5 +1,6 @@
 import { Injectable, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { dateTimestampProvider } from 'rxjs/internal/scheduler/dateTimestampProvider';
 import { PrismaService } from 'src/core/database/prisma.service';
 
 @ApiBearerAuth()
@@ -41,4 +42,26 @@ export class UsersService {
             }
         }
     }
+
+    async getUserInfo(id:number) {
+        const user = await this.prisma.users.findUnique(
+            {
+                where:{id:id} , 
+                select:{
+                    id:true,
+                    full_name:true,
+                    phone_number:true,
+                    email:true,
+                    role:true,
+                    created_at:true,
+                    updated_at:true,
+                } 
+            })
+    
+        return {
+            success:true,
+            data:user
+        }
+    }
+
 }

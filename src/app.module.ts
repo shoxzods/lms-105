@@ -12,6 +12,9 @@ import { StudentsModule } from './modules/students/students.module';
 import { CoursesModule } from './modules/courses/courses.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { CourseCategoriesModule } from './modules/course-categories/course-categories.module';
+import { SectionsModule } from './modules/sections/sections.module';
+import { LessonsModule } from './modules/lessons/lessons.module';
 
 
 @Module({
@@ -24,7 +27,7 @@ import { join } from 'path';
     }),
     PrismaModule, 
     SeederModule, 
-    AuthModule, UsersModule, AdminsModule, MentorModule, AssistentModule, StudentsModule, CoursesModule
+    AuthModule, UsersModule, AdminsModule, MentorModule, AssistentModule, StudentsModule, CoursesModule, CourseCategoriesModule, SectionsModule, LessonsModule
 ]})
 
 export class AppModule {} 

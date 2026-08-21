@@ -118,7 +118,7 @@ model Lessons {
   section_id Int
   name String
   description String
-  video_file  String
+  video_file  String ? 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   @@map("lessons")

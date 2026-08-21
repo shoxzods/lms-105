@@ -1,6 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger"
-import { Type } from "class-transformer"
-import { IsArray, IsInt, IsNotEmpty, IsOptional, IsPhoneNumber, IsString, MinLength } from "class-validator"
+import { IsInt, IsNotEmpty, IsOptional, IsPhoneNumber, IsString, MinLength } from "class-validator"
 
 export class CreateAssistantDto {
     @ApiProperty({example:"primov shoxzod"})
@@ -15,11 +14,9 @@ export class CreateAssistantDto {
     phone_number!:string
     
     @ApiProperty({example:[1,2,3]})
-    @IsArray()
-    @Type(() => Number)
-    @IsOptional()
-    @IsInt({each:true})
-    courses!:number[]
+    @IsInt()
+    @IsNotEmpty()
+    courseId!:number
 
     @ApiProperty({example:"12345"})
     @IsString()

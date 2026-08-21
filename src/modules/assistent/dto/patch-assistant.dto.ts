@@ -19,7 +19,7 @@ export class PatchAssistantDto {
     @Type(() => Number)
     @IsOptional()
     @IsInt({each:true})
-    courses!:number[]
+    courseId!:number
 
     @ApiProperty({example:"example@gmail.com" , required:false})
     @IsOptional()
