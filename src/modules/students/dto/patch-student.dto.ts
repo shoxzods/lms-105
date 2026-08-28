@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger"
-import { IsMobilePhone, IsOptional, IsString, MinLength } from "class-validator"
+import { IsInt, IsMobilePhone, IsOptional, IsPositive, IsString, MinLength } from "class-validator"
 
 export class PatchStudentDto {
     @ApiProperty({example:"string"})
@@ -7,6 +7,12 @@ export class PatchStudentDto {
     @IsOptional()
     @MinLength(5)
     full_name!:string
+
+
+    @ApiProperty({example:1})
+    @IsInt()
+    @IsPositive()
+    courseId!:number
 
     @IsMobilePhone()
     @IsOptional()

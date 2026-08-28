@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger"
 import { Courselevel } from "@prisma/client"
 import { Type } from "class-transformer"
-import { IsNotEmpty, IsNumber, IsPositive, IsString, MinLength } from "class-validator"
+import { IsInt, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString, MinLength } from "class-validator"
 
 export class CreateCourseDto {
   @ApiProperty({description:"string"})
@@ -21,6 +21,14 @@ export class CreateCourseDto {
   @IsNotEmpty()
   @IsPositive()
   prize!:number
+
+  @ApiProperty({description:"integer"})
+  @IsInt()
+  @IsPositive()
+  @IsOptional()
+  @Type(() => Number)
+  categoryId!:number
+
 
   @ApiProperty({description:"string" , enum:["BEGINNER" ,  "ELEMENTARY" , "PRE_INTERMIDIATE" , "INTERMIDIATE"]})
   @IsString()

@@ -38,10 +38,11 @@ model Users {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  mentorProiles MentorProfile[]
+  mentorProfiles MentorProfile[]
 
   @@map("users")
   courses Courses[]
+  studentCourses StudentCourse[]
 }
 
 model MentorProfile {
@@ -88,7 +89,7 @@ model Courses {
   name String @unique
   description String
   prize  Decimal
-  level Courselevel 
+  level Courselevel
   category_id Int?
 
   created_at DateTime @default(now())
@@ -97,8 +98,20 @@ model Courses {
 
   category Categories? @relation(fields: [category_id], references: [id])
   user Users? @relation(fields: [assistant_id] , references: [id])
-  mentorProile MentorProfile? @relation(fields: [mentor_id] , references: [id])
+  mentorProfile MentorProfile? @relation(fields: [mentor_id] , references: [id])
   sections Section[]
+  studentCourses StudentCourse[]
+}
+
+model StudentCourse {
+  id Int @id @default(autoincrement())
+  studentId Int?
+  courseId Int
+
+  @@map("students_course")
+  @@unique([studentId, courseId])
+  students Users ? @relation(fields:[studentId] , references: [id])
+  courses Courses @relation(fields:[courseId] , references: [id])
 }
 
 model Section {
@@ -126,6 +139,7 @@ model Lessons {
   section Section @relation(fields: [section_id] , references: [id])
   homeWorks HomeWorks[]
   exams Exams[]
+  materials Material[]
 }
 
 model Material {
@@ -137,6 +151,7 @@ model Material {
 
   @@map("materials")
   materialFiles MaterialFile[]
+  lessons Lessons @relation(fields: [lesson_id] , references: [id])
 }
 
 model MaterialFile {

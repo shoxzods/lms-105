@@ -13,9 +13,9 @@ export class CreateAssistantDto {
     @IsNotEmpty()
     phone_number!:string
     
-    @ApiProperty({example:[1,2,3]})
+    @ApiProperty({example:1})
     @IsInt()
-    @IsNotEmpty()
+    @IsOptional()
     courseId!:number
 
     @ApiProperty({example:"12345"})

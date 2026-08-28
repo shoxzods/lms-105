@@ -1,5 +1,5 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/core/database/prisma.service';
+import { PrismaService } from '../../core/database/prisma.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import hashing from "../../common/config/hash"
 import { PatchStudentDto } from './dto/patch-student.dto';
@@ -44,16 +44,34 @@ export class StudentsService {
                                             full_name:true,
                                             phone_number:true,
                                             role:true,
-                                            created_at:true
+                                            created_at:true,
                                         }});
-    
+                
+
                 if(!user) {
                     throw new NotFoundException("User with this id not found")
                 }
     
+                const studnetInfo = await this.prisma.studentCourse.groupBy(
+                    {
+                        by:["studentId"],
+                        where: {
+                            studentId:user.id
+                        },
+                        _count: {
+                            courseId:true
+                        }
+                    }
+                );
+
+                const course_number = studnetInfo[0]._count.courseId;
+
                 return {
                     success:true,
-                    data: user
+                    data: {
+                        ...user,
+                        course_number
+                    }
                 }
             }
     
@@ -65,7 +83,7 @@ export class StudentsService {
         }
 
         const hashedPassword = await hashing.HashingPassword(payload.password);
-        await this.prisma.users.create(
+        const users = await this.prisma.users.create(
             {
                 data:{
                     full_name:payload.full_name,
@@ -73,7 +91,20 @@ export class StudentsService {
                     password:hashedPassword,
                     role:"STUDENT"
                 }
-            })
+            });
+        
+        const existCourse = await this.prisma.courses.findUnique({where:{id:payload.courseId}});
+
+        if(!existCourse) {
+            throw new NotFoundException("course not found")
+        }
+
+        await this.prisma.studentCourse.create({
+            data: {
+                studentId:users.id,
+                courseId:existCourse.id
+            }
+        });
 
         return {
             success:true,
@@ -127,8 +158,17 @@ export class StudentsService {
             throw new NotFoundException("User with this id not found")
         }
 
+        const existCourse = await this.prisma.courses.findUnique({where:{id:payloud.courseId}})
+        
+        if(!existCourse) {
+            throw new NotFoundException("course not found")
+        }
+
+
         try {
-        await this.
+           await  
+        Promise.all([
+            this.
                 prisma.
                 users.
                 update(
@@ -137,14 +177,25 @@ export class StudentsService {
                         data:{ 
                             full_name:payloud.full_name , 
                             phone_number:payloud.phone_number 
-                    }})
+                    }}) ,
         
+        this.prisma.studentCourse.create({
+            data: {
+                studentId:existUser.id,
+                courseId:existCourse.id
+            }
+        }) ])
+                    
         return {
             success:true,
             message:"User updated successfully"
         }
         } catch(err) {
             if (err instanceof Error) {
+                if(err.name == "PrismaClientKnownRequestError") {
+                    throw new ConflictException("this user already in this course")    
+                }
+
                 throw new ConflictException("User with this phone_number already exists")
             }
         }

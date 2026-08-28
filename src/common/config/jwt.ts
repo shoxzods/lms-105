@@ -8,7 +8,7 @@ export class JWTtoken {
     accessToken(payloud:object) {
         return this.jwt.sign(payloud, {
                 secret: process.env.SECRET_KEY,
-                expiresIn: "10m",
+                expiresIn: "20m",
                });
     }
 

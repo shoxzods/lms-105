@@ -1,11 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/core/database/prisma.service';
+import { PrismaService } from '../../core/database/prisma.service';
 import { CreateMentorDto } from './dto/create_mentor.dto';
 import hashing from "../../common/config/hash"
 import { PatchMentorDto } from './dto/patch-mentor.dto';
-import { retry } from 'rxjs';
-import { MentorModule } from './mentor.module';
-import { userInfo } from 'os';
 
 @Injectable()
 export class MentorService {
@@ -54,6 +51,7 @@ export class MentorService {
                 user_id:id
             },
             select:{
+                id:true,
                 job:true,
                 experience:true,
                 description:true,
@@ -65,7 +63,8 @@ export class MentorService {
                 telegram:true,
                 web_link:true,
             }
-        })
+        });
+
 
         return {
             success:true,

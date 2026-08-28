@@ -2,9 +2,9 @@ import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe
 import { CreateCourseDto } from './dto/create-course.dto';
 import { CoursesService } from './courses.service';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
-import { AuthGuard } from 'src/common/guards/auth.guard';
-import { RoleGuard } from 'src/common/guards/role.guard';
-import { Roles } from 'src/common/decorators/role';
+import { AuthGuard } from '../../common/guards/auth.guard';
+import { RoleGuard } from '../../common/guards/role.guard';
+import { Roles } from '../../common/decorators/role';
 import { UserRoles } from '@prisma/client';
 import { FileFieldsInterceptor} from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -26,7 +26,6 @@ export class CoursesController {
         return message
     }
 
-
     @ApiOperation({summary:`${UserRoles.SUPERADMIN} , ${UserRoles.ADMIN}`})
     @Roles(UserRoles.SUPERADMIN , UserRoles.ADMIN)
     @UseGuards(AuthGuard , RoleGuard)
@@ -46,10 +45,16 @@ export class CoursesController {
         return message
     }
 
-
+    @ApiOperation({summary:`${UserRoles.SUPERADMIN} , ${UserRoles.ADMIN}`})
+    @Roles(UserRoles.SUPERADMIN , UserRoles.ADMIN)
+    @UseGuards(AuthGuard , RoleGuard)
+    @Post("/:course_id/mentor/:mentor_id")
+    async addMentorToCourse(@Param("course_id" , ParseIntPipe) course_id:number , @Param("mentor_id" , ParseIntPipe) mentor_id:number) {
+        return await this.courseService.addMentorToCourse( course_id , mentor_id )
+    }
 
     @ApiOperation({summary:`${UserRoles.SUPERADMIN} , ${UserRoles.ADMIN}`})
-    @ApiConsumes("multipart/form-data")
+    @ApiConsumes("multipart/form-data") 
     @ApiBody({
         schema:{
             type:"object",
@@ -59,6 +64,7 @@ export class CoursesController {
                 prize:{type:"number"},
                 banner:{type:"string" , format:"binary"},
                 intro_video:{type:"string" , format:"binary" , nullable:true},
+                categoryId:{type:"number"},
                 level:{type:"string" , enum:[ "BEGINNER" ,  "ELEMENTARY" , "PRE_INTERMIDIATE" , "INTERMIDIATE"]},
             },
             required: [
@@ -89,17 +95,13 @@ export class CoursesController {
             if(file.fieldname == "banner") {
                 const imgTypes = ["svg" , "png" , "jpeg" , "gif"];
 
-                console.log(imgTypes.includes(file.mimetype.split('/')[1]));
-
-                if( !imgTypes.includes(file.mimetype.split('/')[1]) ) {
+                if( !imgTypes.includes(file.mimetype.split('/')[1]) )
                     return cb(new BadRequestException("only (svg , png , jpg and gif) formats permited") , false)
-                }
             }
 
             if ( file.fieldname == "intro_video" ) {
-                if(file.mimetype.split("/")[1] != "mp4" ) {
+                if(file.mimetype.split("/")[1] != "mp4" )
                     return cb(new BadRequestException("only mp4 permitted") , false)
-                }
             }
 
             cb(null , true)
@@ -143,6 +145,14 @@ export class CoursesController {
         return message
     }
 
+    @ApiOperation({summary:`${UserRoles.SUPERADMIN} , ${UserRoles.ADMIN}`})
+    @Roles(UserRoles.SUPERADMIN , UserRoles.ADMIN)
+    @UseGuards(AuthGuard , RoleGuard)
+    @Delete("/:course_id/mentor/:mentor_id")
+    async deleteMentorFromGroup(@Param("course_id" , ParseIntPipe)  course_id:number , @Param("mentor_id" , ParseIntPipe) mentor_id:number ) {
+        return await this.courseService.deleteMentorFromGroup(course_id , mentor_id)
+    }
+
 
     @ApiOperation({summary:`${UserRoles.SUPERADMIN} , ${UserRoles.ADMIN}`})
     @ApiConsumes("multipart/form-data")
@@ -156,6 +166,7 @@ export class CoursesController {
                 banner:{type:"string" , format:"binary"},
                 intro_video:{type:"string" , format:"binary" , nullable:true},
                 level:{type:"string" , enum:[ "BEGINNER" ,  "ELEMENTARY" , "PRE_INTERMIDIATE" , "INTERMIDIATE"]},
+                categoryId:{type:"number"}
             }
         }
     })
@@ -203,5 +214,3 @@ export class CoursesController {
         return message
     }
 }
-
-// nullable , enum

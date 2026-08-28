@@ -18,12 +18,12 @@ export class UserSeeder implements OnModuleInit {
             {
               data: {
                 full_name:"Shoxzod Primov",
-                phone_number:"+998995507613",
-                email:"ranaldu456@gmail.com",
+                phone_number:process.env.USER_PHONE as string,
+                email:process.env.USER_MAIL,
                 password: await hash.HashingPassword(process.env.USER_PASSWORD as string),
                 role:UserRoles.SUPERADMIN 
               }
-            }
+            } 
         )
 
         Logger.log("✅ Superadmin created successfully")

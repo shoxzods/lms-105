@@ -1,9 +1,12 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'src/core/database/prisma.service';
+import { PrismaService } from '../../core/database/prisma.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { it } from 'node:test';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
 import { FileWatcherEventKind } from 'typescript';
+import { CreateLessonMaterialDto } from './dto/create-material.dto';
+import { UpdateLessonMaterialDto } from './dto/update-material.dto';
+import { ApiGatewayTimeoutResponse } from '@nestjs/swagger';
 
 @Injectable()
 export class LessonsService {
@@ -142,4 +145,168 @@ export class LessonsService {
         }
     }
 
+    async createLessonMaterial(payloud:CreateLessonMaterialDto , files:Express.Multer.File[]) {
+        const existLesson = await this.prisma.lessons.findUnique({where:{id:payloud.lessonId}})
+
+        if(!existLesson)
+            throw new NotFoundException("lesson not found")
+
+
+        const material = await this.prisma.material.create({
+            data: {
+                lesson_id:existLesson.id,
+                description:payloud.description,
+            }
+        });
+
+        await this.prisma.materialFile.createMany({
+            data: files.map((file:{filename:string}) => ({
+                material_id:material.id,
+                file:file.filename
+            }))
+        });
+
+        return {
+            success:true,
+            message: "lesson material created succesfully"
+        }
+    }
+
+
+    async getAllLessonMaterials() {
+       const materials = await this.prisma.material.findMany({
+          select: {
+            id: true,
+            description: true,
+            created_at: true,
+            updated_at: true,
+        
+            lessons: {
+              select: {
+                id: true,
+                name: true,
+                created_at: true,
+                updated_at: true,
+              },
+            },
+        
+            materialFiles: {
+              select: {
+                id: true,
+                file: true,
+                created_at: true,
+                updated_at: true,
+              },
+            },
+          },
+        });
+
+        return {
+            success:true,
+            data:materials
+        }
+    }
+
+
+    async deleteLessonMaterial(id:number) {
+        const existLessonMaterial = await this.prisma.material.findUnique({where:{id}});
+
+        if(!existLessonMaterial)
+            throw new NotFoundException("lesson material not found")
+        
+        await Promise.all([
+            this.prisma.materialFile.deleteMany({where:{material_id:existLessonMaterial.id}}),
+            this.prisma.material.delete({where:{id:id}})
+        ]);
+
+        return {
+            success:true,
+            message:"lesson material removed successfully"
+        }
+    }
+
+    async getOneLessonMaterial(id:number) {
+        const material = await this.prisma.material.findUnique({
+          where:{
+            id
+          },
+          select: {
+            id: true,
+            description: true,
+            created_at: true,
+            updated_at: true,
+        
+            lessons: {
+              select: {
+                id: true,
+                name: true,
+                created_at: true,
+                updated_at: true,
+              },
+            },
+        
+            materialFiles: {
+              select: {
+                id: true,
+                file: true,
+                created_at: true,
+                updated_at: true,
+              },
+            },
+          },
+        });
+        
+
+        if(!material)
+            throw new NotFoundException("lesson material not found")
+
+        return {
+            success:true,
+            data:material
+        }
+    }
+
+    async updateLessonMaterial(payloud:UpdateLessonMaterialDto, id:number , files:Express.Multer.File[]) {
+        const existLessonMaterial = await this.prisma.material.findUnique({where:{id}});
+
+        if(!existLessonMaterial)
+            throw new NotFoundException("lesson material not found")
+
+        const existLesson = payloud.lessonId ? await this.prisma.lessons.findUnique({where:{id:payloud.lessonId}}) : "false";
+
+        if(!existLesson)
+            throw new NotFoundException("lesson not found")
+
+        await Promise.all([
+
+            this.prisma
+                .material
+                .update(
+                    {
+                        where:{
+                            id:existLessonMaterial.id
+                        },
+                        data:{
+                            lesson_id: existLesson == 'false' ? existLessonMaterial.lesson_id : existLesson.id,
+                            description: payloud.description ? payloud.description : existLessonMaterial.description
+                        }
+                    }),
+
+                    this.prisma.materialFile.deleteMany({where:{material_id:existLessonMaterial.id}})
+        ]);
+
+
+        if(files)
+            await this.prisma.materialFile.createMany({
+                data: files.map((file:{filename:string}) => ({
+                    material_id:existLessonMaterial.id,
+                    file:file.filename
+                }))
+            });
+
+        return {
+            success:true,
+            message:"lesson material updated successfully"
+        }
+    }
 }

@@ -14,11 +14,9 @@ export class PatchAssistantDto {
     @IsOptional()
     phone_number!:string
     
-    @ApiProperty({example:[1,2,3] , required:false})
-    @IsArray()
-    @Type(() => Number)
+    @ApiProperty({example:1 , required:false})
     @IsOptional()
-    @IsInt({each:true})
+    @IsInt()
     courseId!:number
 
     @ApiProperty({example:"example@gmail.com" , required:false})

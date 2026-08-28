@@ -1,9 +1,9 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { UserRoles } from '@prisma/client';
-import { Roles } from 'src/common/decorators/role';
-import { AuthGuard } from 'src/common/guards/auth.guard';
-import { RoleGuard } from 'src/common/guards/role.guard';
+import { Roles } from '../../common/decorators/role';
+import { AuthGuard } from '../../common/guards/auth.guard';
+import { RoleGuard } from '../../common/guards/role.guard';
 import { AssistentService } from './assistent.service';
 import { CreateAssistantDto } from './dto/create-assistant.dto';
 import { PatchAssistantDto } from './dto/patch-assistant.dto';

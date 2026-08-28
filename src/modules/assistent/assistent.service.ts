@@ -1,8 +1,9 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAssistantDto } from './dto/create-assistant.dto';
-import { PrismaService } from 'src/core/database/prisma.service';
+import { PrismaService } from '../../core/database/prisma.service';
 import hashing from "../../common/config/hash"
 import { PatchAssistantDto } from './dto/patch-assistant.dto';
+import { convertToObject } from 'typescript';
 
 @Injectable()
 export class AssistentService {
@@ -44,6 +45,7 @@ export class AssistentService {
                     id:true,
                     full_name:true,
                     phone_number:true,
+                    courses:true,
                     role:true,
                     created_at:true,
                 },
@@ -59,7 +61,7 @@ export class AssistentService {
 
 
     async createUserAssistant(payloud:CreateAssistantDto) {
-         const existCourse = await this.prisma.courses.findUnique({where:{id:payloud.courseId}});
+        const existCourse = payloud.courseId ? await this.prisma.courses.findUnique({where:{id:payloud.courseId}}) : true;
 
         if(!existCourse) {
             throw new NotFoundException("course not found")
@@ -68,7 +70,10 @@ export class AssistentService {
     try {
         const hashedPassword = await hashing.HashingPassword(payloud.password);
         const assistant = await this.prisma.users.create({data:{ full_name:payloud.full_name , phone_number:payloud.phone_number , password:hashedPassword, role:"ASSISTANT"}})
-        await this.prisma.courses.update({where:{id:payloud.courseId} , data:{assistant_id:assistant.id}});
+        
+        if(payloud.courseId) {
+            await this.prisma.courses.update({where:{id:payloud.courseId} , data:{assistant_id:assistant.id}});
+        }
 
         return {
             success:true,
@@ -150,11 +155,26 @@ export class AssistentService {
                         email:payload.email,
                         full_name:payload.full_name,
                         password:hashedPassword,
-                        phone_number:payload.phone_number
+                        phone_number:payload.phone_number,
                     }
                 },
-                
-            )
+            );
+
+            if(payload.courseId) {
+                const existsCourse = await this.prisma.courses.findUnique({where:{id:payload.courseId}});
+
+                if(existsCourse) {
+                    await this.prisma.courses.update(
+                        {
+                            where:{
+                                id:existsCourse.id
+                            },
+                            data: {
+                                assistant_id:user.id
+                            }
+                        })
+                }
+            }
            
             return {
                 success:true,
@@ -166,5 +186,4 @@ export class AssistentService {
                 }
             }
         }
-    
 }

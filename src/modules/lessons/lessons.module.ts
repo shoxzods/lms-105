@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { LessonsService } from './lessons.service';
 import { LessonsController } from './lessons.controller';
-import { JWTtoken } from 'src/common/config/jwt';
+import { JWTtoken } from '../../common/config/jwt';
 
 @Module({
   providers: [LessonsService , JWTtoken],
