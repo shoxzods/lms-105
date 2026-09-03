@@ -25,6 +25,14 @@ function parseDateInput(str?: string): Date | null {
     const d = new Date(year, month, day);
     if (!isNaN(d.getTime())) return d;
   }
+  const dashParts = trimmed.split("-");
+  if (dashParts.length === 3 && dashParts[0].length === 4) {
+    const year = parseInt(dashParts[0], 10);
+    const month = parseInt(dashParts[1], 10) - 1;
+    const day = parseInt(dashParts[2], 10);
+    const d = new Date(year, month, day);
+    if (!isNaN(d.getTime())) return d;
+  }
   const d = new Date(trimmed);
   if (!isNaN(d.getTime())) return d;
   return null;
@@ -324,10 +332,20 @@ export class ExamService {
     let start: Date | null = null;
     let end: Date | null = null;
 
-    if (dateRange && dateRange.includes("-")) {
-      const [startPart, endPart] = dateRange.split("-");
-      start = parseDateInput(startPart);
-      end = parseDateInput(endPart);
+    if (dateRange) {
+      const match = dateRange.match(
+        /(\d{1,4}[.-]\d{1,2}[.-]\d{1,4})\s*(?:[-–]|to)\s*(\d{1,4}[.-]\d{1,2}[.-]\d{1,4})/,
+      );
+      if (match) {
+        start = parseDateInput(match[1]);
+        end = parseDateInput(match[2]);
+      } else if (dateRange.includes("-")) {
+        const parts = dateRange.split("-");
+        if (parts.length === 2) {
+          start = parseDateInput(parts[0]);
+          end = parseDateInput(parts[1]);
+        }
+      }
     } else {
       if (startDate) start = parseDateInput(startDate);
       if (endDate) end = parseDateInput(endDate);
