@@ -62,7 +62,7 @@ export class AuthService {
 
     return {
       success: true,
-      role:"",
+      role:req.user,
       accessToken: this.jwtToken.jwtAccessToken({
         id: existUser.id,
         full_name: existUser.full_name,
