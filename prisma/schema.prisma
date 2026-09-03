@@ -41,6 +41,11 @@ enum Answer {
   variantD
 }
 
+enum ExamStatus {
+  PASSED
+  FAILED
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   full_name String
@@ -60,6 +65,7 @@ model User {
   resetPasses      ResetPass[]
   purchasedCourses PurchasedCourse[]
   chatsSent        ChatMessage[]     @relation("ChatSender")
+  examResults      ExamResult[]
 
   @@map("users")
 }
@@ -187,10 +193,11 @@ model Lessons {
   create_at   DateTime @default(now())
   update_at   DateTime @updatedAt
 
-  sections  Sections    @relation(fields: [sectionId], references: [id])
-  materials Materials[]
-  homeworks Homeworks[]
-  exams     Exam[]
+  sections    Sections     @relation(fields: [sectionId], references: [id])
+  materials   Materials[]
+  homeworks   Homeworks[]
+  exams       Exam[]
+  examResults ExamResult[]
 
   @@map("lessons")
 }
@@ -246,6 +253,28 @@ model Exam {
   lessons Lessons @relation(fields: [lessonId], references: [id])
 
   @@map("exam")
+}
+
+model ExamResult {
+  id             Int        @id @default(autoincrement())
+  userId         Int
+  lessonId       Int
+  totalQuestions Int
+  correctAnswers Int
+  wrongAnswers   Int
+  percentage     Float
+  status         ExamStatus @default(FAILED)
+  details        Json?
+  create_at      DateTime   @default(now())
+  update_at      DateTime   @updatedAt
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lessons @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([lessonId])
+  @@index([create_at])
+  @@map("exam_results")
 }
 
 model ChatMessage {

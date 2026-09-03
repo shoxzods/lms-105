@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Req,
   Delete,
   Get,
   Param,
@@ -9,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiOperation } from "@nestjs/swagger";
@@ -23,6 +23,7 @@ import { CreateExamDto } from "./dto/create-exam.dto";
 import { QueryExamDto } from "./dto/query-exam.dto";
 import { CheckExamDto } from "./dto/check-exam.dto";
 import { UpdateExamDto } from "./dto/update-exam.dto";
+import { QueryExamResultDto } from "./dto/query-exam-result.dto";
 
 @ApiBearerAuth()
 @UseGuards(AuthGuard, RoleGuard, CourseAccessGuard)
@@ -40,7 +41,7 @@ export class ExamController {
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
   @CourseAccess("lesson")
-  @ApiOperation({ summary: "Testlar ro'yxati" })
+  @ApiOperation({ summary: "Test savollari ro'yxati" })
   @Get()
   findAll(@Query() query: QueryExamDto, @Req() req: Request) {
     return this.examService.findAll(query, req["user"]);
@@ -48,11 +49,60 @@ export class ExamController {
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
   @CourseAccess("lesson")
-  @ApiOperation({ summary: "Javoblarni tekshirish va ball olish" })
+  @ApiOperation({
+    summary: "Javoblarni tekshirish, ball olish va natijani saqlash",
+  })
   @Post("check")
-  check(@Body() payload: CheckExamDto) {
-    return this.examService.check(payload);
+  check(@Body() payload: CheckExamDto, @Req() req: Request) {
+    return this.examService.check(payload, req["user"]);
   }
+
+  // ==================== RESULTS ENDPOINTS ====================
+
+  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
+  @ApiOperation({
+    summary: "Barcha talabalar natijalari (Admin / Superadmin / Mentor)",
+  })
+  @Get("results")
+  findAllResults(@Query() query: QueryExamResultDto, @Req() req: Request) {
+    return this.examService.findAllResults(query, req["user"]);
+  }
+
+  @Roles(UserRole.STUDENT)
+  @ApiOperation({ summary: "O'quvchining o'z imtihon natijalari tarixi" })
+  @Get("results/my")
+  findMyResults(@Query() query: QueryExamResultDto, @Req() req: Request) {
+    return this.examService.findMyResults(query, req["user"]);
+  }
+
+  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
+  @ApiOperation({ summary: "Imtihon natijalari statistikasi" })
+  @Get("results/stats")
+  getResultStats(@Req() req: Request) {
+    return this.examService.getResultStats(req["user"]);
+  }
+
+  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
+  @ApiOperation({ summary: "Bitta imtihon natijasi va batafsil javoblar" })
+  @Get("results/:id")
+  findOneResult(
+    @Param("id", ParseIntPipe) id: number,
+    @Req() req: Request,
+  ) {
+    return this.examService.findOneResult(id, req["user"]);
+  }
+
+  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
+  @ApiOperation({ summary: "Imtihon natijasini o'chirish" })
+  @Delete("results/:id")
+  removeResult(
+    @Param("id", ParseIntPipe) id: number,
+    @Req() req: Request,
+  ) {
+    return this.examService.removeResult(id, req["user"]);
+  }
+
+  // ==================== QUESTION BY ID ====================
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
   @CourseAccess("exam")
@@ -82,3 +132,4 @@ export class ExamController {
     return this.examService.remove(id, req["user"]);
   }
 }
+
