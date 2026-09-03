@@ -24,7 +24,9 @@ export class AuthService {
     private jwtToken: JwtToken,
   ) {}
 
-  async login(payload: LoginDto) {
+  async login(req:any, payload: LoginDto) {
+    console.log(req)
+
     const existUser = await this.prisma.user.findFirst({
       where: {
         phone: payload.phone,
@@ -60,6 +62,7 @@ export class AuthService {
 
     return {
       success: true,
+      role:"",
       accessToken: this.jwtToken.jwtAccessToken({
         id: existUser.id,
         full_name: existUser.full_name,

@@ -7,7 +7,7 @@ import {
 import { JwtService } from "@nestjs/jwt";
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class AuthGuard implements CanActivate { 
   constructor(private jwtService: JwtService) {}
   canActivate(context: ExecutionContext): boolean {
     //contex bodydan keladigan requestni ushlab beradi!
@@ -28,6 +28,7 @@ export class AuthGuard implements CanActivate {
       req.user = this.jwtService.verify(token, {
         secret: process.env.SECRET_KEY,
       });
+
       return true;
     } catch {
       throw new UnauthorizedException("The token is invalid or expired"); //Token yaroqsiz yoki muddati tugagan
