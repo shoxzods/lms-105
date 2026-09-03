@@ -1,9 +1,9 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsStrongPassword } from "src/common/config/password";
+import { IsStrongPassword } from "../../../common/config/password";
 import {
-  IsMobilePhone,
   IsNotEmpty,
   IsString,
+  Matches,
   MaxLength,
   MinLength,
 } from "class-validator";
@@ -17,7 +17,9 @@ export class RegisterDto {
   full_name!: string;
 
   @ApiProperty({ example: "+998901234599" })
-  @IsMobilePhone()
+  @Matches(/^\+998(77|33|90|91|93|94|95|97|98|99|88|50|55)\d{7}$/, {
+    message: "Telefon raqami noto'g'ri formatda",
+  })
   phone!: string;
 
   @IsStrongPassword()
