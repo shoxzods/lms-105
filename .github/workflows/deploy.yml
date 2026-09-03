@@ -1,3 +1,5 @@
+name: Deploy Backend
+
 on:
   push:
     branches:
@@ -9,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Deploy over SSH and run Docker Compose
         uses: appleboy/ssh-action@v1.0.3
@@ -18,24 +20,24 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            echo "Creating project folder if it doesn't exist!"
+            set -e
+            echo "Navigating to project directory..."
             mkdir -p /home/ubuntu
             cd /home/ubuntu
 
             if [ ! -d "lms-105/.git" ]; then
-              echo "Cloning repository!" 
-              git clone https://github.com/shoxzods/lms-105
+              echo "Cloning repository..."
+              git clone https://github.com/shoxzods/lms-105.git
+              cd lms-105
             else
-              echo "Pulling latest changes!"
-              cd lms-105   
-              git pull origin main  
+              echo "Pulling latest changes..."
+              cd lms-105
+              git fetch origin main
+              git reset --hard origin/main
             fi
-  
-            echo "Stopping containers"
+
+            echo "Rebuilding and restarting containers..."
             docker compose down
-
-            echo "Building containers"
-            docker compose build 
-
-            echo "Running containers"
-            docker compose up -d 
+            docker compose build --no-cache
+            docker compose up -d
+ 
