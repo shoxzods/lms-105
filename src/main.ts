@@ -6,7 +6,7 @@ import { ValidationPipe } from "@nestjs/common";
 import { SwaggerModule } from "@nestjs/swagger";
 import { config } from "./common/config/swagger";
 import { AllExceptionsFilter } from "./common/filters/all-exceptions.filter";
-import { corsOptions } from "./common/config/cors";
+// import { corsOptions } from "./common/config/cors"; 
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -14,8 +14,6 @@ async function bootstrap() {
   app.useStaticAssets(join(process.cwd(), "src", "uploads"), {
     prefix: "/uploads",
   });
-
-  app.enableCors(corsOptions);
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -29,7 +27,7 @@ async function bootstrap() {
   app.setGlobalPrefix("/api/v1"); //xamma endpointlani oldiga qoyib beradi!
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup("swagger", app, documentFactory);
+  SwaggerModule.setup("api", app, documentFactory);
 
   await app.listen(process.env.PORT ?? 3000, "0.0.0.0");
 }

@@ -1,9 +1,5 @@
 const FALLBACK = "http://localhost:3001";
 
-/**
- * Ruxsat etilgan manzillar `CORS_ORIGIN` dan vergul bilan ajratib beriladi:
- * CORS_ORIGIN=https://lms.vercel.app,http://localhost:3001
- */
 export function corsOrigins(): string[] {
   const raw = process.env.CORS_ORIGIN?.trim();
 

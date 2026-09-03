@@ -6,13 +6,13 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from "@nestjs/common";
-import { PrismaService } from "src/core/database/prisma.service";
+import { PrismaService } from "../../core/database/prisma.service";
 import { LoginDto } from "./dto/login.dto";
 import * as bcrypt from "bcrypt";
-import { JwtToken } from "src/common/config/jwt";
+import { JwtToken } from "../../common/config/jwt";
 import { RegisterDto } from "./dto/register.dto";
 import { PaymentStatus, Status, UserRole } from "@prisma/client";
-import hashPassword from "src/common/config/hash";
+import hashPassword from "../../common/config/hash";
 import { VerifyOtpDto } from "./dto/verify-otp.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
 import { RefreshDto } from "./dto/refresh.dto";
