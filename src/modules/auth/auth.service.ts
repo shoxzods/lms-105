@@ -1,8 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
-import { PrismaService } from 'src/core/database/prisma.service';
-import { JWTtoken } from 'src/common/config/jwt';
+import { PrismaService } from '../../core/database/prisma.service';
+import { JWTtoken } from '../../common/config/jwt';
 import hashing from "../../common/config/hash";
+import { RegisterDto } from './dto/register.dto';
+import { UserRoles } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -44,6 +46,37 @@ export class AuthService {
                 email: users.email,
                 role: users.role
             })
-        };
+        }
     }
+
+    async register(payload:RegisterDto) {
+        const users = await this.prisma.users.findUnique({where:{phone_number:payload.phone_number}});
+
+        if(users)
+            throw new ConflictException("user with this phone number already exists")
+
+        if(payload.password !== payload.confirm_password)
+            throw new BadRequestException("password does not match with confirm_password")
+
+        const newUser = await this
+                .prisma
+                .users
+                .create({
+                    data: {
+                        full_name:payload.full_name,
+                        phone_number:payload.phone_number,
+                        password: await hashing.HashingPassword(payload.password),
+                        role:UserRoles.STUDENT
+                    }
+                })
+
+        return {
+            success:true,
+            accessToken: this.jwt.accessToken({
+                id:newUser.id,
+                email:newUser.email,
+                role:newUser.role  
+            })
+    }
+}
 }

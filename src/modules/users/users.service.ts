@@ -1,7 +1,8 @@
-import { Injectable, UseGuards } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { dateTimestampProvider } from 'rxjs/internal/scheduler/dateTimestampProvider';
-import { PrismaService } from 'src/core/database/prisma.service';
+import { PrismaService } from '../../core/database/prisma.service';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import hashing from "../../common/config/hash"
 
 @ApiBearerAuth()
 @Injectable()
@@ -52,7 +53,6 @@ export class UsersService {
                     full_name:true,
                     phone_number:true,
                     email:true,
-                    role:true,
                     created_at:true,
                     updated_at:true,
                 } 
@@ -64,4 +64,23 @@ export class UsersService {
         }
     }
 
+    async changeUserPassword( payloud:UpdatePasswordDto , id:number) {
+        const hashedPassword = await this.prisma.users.findUnique({where:{id} , select:{password:true}})
+        const checkCurrentPassword = await hashing.PasswordVerify(hashedPassword!.password , payloud.current_password)
+
+        if(!checkCurrentPassword)
+            throw new BadRequestException("current password is not correct")
+
+        if(payloud.new_password !== payloud.confirm_password)
+            throw new BadRequestException("new_password does not match confirm password")
+
+        const newPassword = await hashing.HashingPassword(payloud.confirm_password);
+
+        await this.prisma.users.update({where:{id} , data:{password:newPassword}})
+
+        return {
+            success:true,
+            message:"user password changed successfully"
+        }
+    }
 }

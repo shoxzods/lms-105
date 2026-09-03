@@ -67,10 +67,15 @@ export class AssistentService {
             throw new NotFoundException("course not found")
         }
 
+        const existAssitantCourse = await this.prisma.courses.findUnique({where:{id:payloud.courseId}})
+        
+        if(existAssitantCourse?.assistant_id)
+            throw new ConflictException("the course already has an assistant")
+
     try {
         const hashedPassword = await hashing.HashingPassword(payloud.password);
         const assistant = await this.prisma.users.create({data:{ full_name:payloud.full_name , phone_number:payloud.phone_number , password:hashedPassword, role:"ASSISTANT"}})
-        
+
         if(payloud.courseId) {
             await this.prisma.courses.update({where:{id:payloud.courseId} , data:{assistant_id:assistant.id}});
         }

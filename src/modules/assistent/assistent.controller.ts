@@ -31,7 +31,6 @@ export class AssistentController {
         return message
     }
 
-
     @ApiOperation({summary:`${UserRoles.SUPERADMIN} , ${UserRoles.ADMIN}`})
     @Roles(UserRoles.SUPERADMIN , UserRoles.ADMIN)
     @UseGuards(AuthGuard , RoleGuard)

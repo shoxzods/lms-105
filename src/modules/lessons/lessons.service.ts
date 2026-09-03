@@ -1,12 +1,13 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../core/database/prisma.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
-import { it } from 'node:test';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
-import { FileWatcherEventKind } from 'typescript';
 import { CreateLessonMaterialDto } from './dto/create-material.dto';
 import { UpdateLessonMaterialDto } from './dto/update-material.dto';
-import { ApiGatewayTimeoutResponse } from '@nestjs/swagger';
+import { CreateHomeworkDto } from './dto/create-homework.dto';
+import { UpdateHomeworkDto } from './dto/update-homework.dto';
+import { CreateExamDto } from './dto/create-exam.dto';
+import { UpdateExamDto } from './dto/update-exam.dto';
 
 @Injectable()
 export class LessonsService {
@@ -173,7 +174,7 @@ export class LessonsService {
     }
 
 
-    async getAllLessonMaterials() {
+    async getAllLessonMaterials(page:number , limit:number) {
        const materials = await this.prisma.material.findMany({
           select: {
             id: true,
@@ -199,6 +200,8 @@ export class LessonsService {
               },
             },
           },
+            take: limit,
+            skip: limit * (page - 1), 
         });
 
         return {
@@ -307,6 +310,206 @@ export class LessonsService {
         return {
             success:true,
             message:"lesson material updated successfully"
+        }
+    }
+
+
+    async createHomework( payloud:CreateHomeworkDto, file:Express.Multer.File ) {
+        const existLesson = await this.prisma.lessons.findUnique({where:{id:payloud.lessonId}});
+
+        if(!existLesson) 
+            throw new NotFoundException("lesson not found")
+        
+        await this
+                .prisma
+                .homeWorks
+                .create(
+                    {
+                        data: {
+                            title:payloud.title,
+                            lesson_id:existLesson.id,
+                            file: file ? Date.now() + "." + file.mimetype.split('/')[1] : null
+                        }
+                    })
+        
+        return {
+            success:true,
+            message:"homework created successfully"
+        }
+    }
+
+    async getAllHomeworks(limit:number , page:number) {
+        const homeworks = await this
+                                .prisma
+                                .homeWorks
+                                .findMany(
+                        {
+                           take: limit,
+                           skip: limit * (page - 1), 
+                        });
+
+        return {
+            success:true,
+            data:homeworks
+        }
+    }
+
+    async getOneLessonHomework(id:number) {
+        const existHomework = await this.prisma.homeWorks.findUnique({where:{id}});
+
+        if(!existHomework)
+            throw new NotFoundException("lesson homework not found")
+
+        return {
+            success:true,
+            data: existHomework
+        }
+    }
+
+    async deleteLessonHomework(id:number) {
+        const existHomework = await this.prisma.homeWorks.findUnique({where:{id}});
+
+        if(!existHomework)
+            throw new NotFoundException("lesson homework not found")
+
+        await this.prisma.homeWorks.delete({where:{id}});
+
+        return {
+            success:true,
+            message:"lesson homework deleted successfully"
+        }
+    }
+
+    async updateLessonHomework(payloud:UpdateHomeworkDto , id:number , file:Express.Multer.File) {
+        const existHomework = await this.prisma.homeWorks.findUnique({where:{id}})
+
+        if(!existHomework) 
+            throw new NotFoundException("homework not found")
+        
+        const existLesson = payloud.lessonId ? await this.prisma.lessons.findUnique({where:{id:payloud.lessonId}}) : true;
+
+        if(!existLesson)
+            throw new NotFoundException("lesson not found")
+
+        await this
+                .prisma
+                .homeWorks
+                .update(
+                    {
+                        where:{
+                            id:existHomework.id
+                        },
+                        data: {
+                            title:payloud.title ? payloud.title : existHomework.title,
+                            lesson_id: payloud.lessonId ? payloud.lessonId : existHomework.lesson_id,
+                            file: file ? Date.now() + "." + file.mimetype.split('/')[1] : existHomework.file
+                        }
+                    })
+
+        return {
+            success:true,
+            message:"lesson homework updated successfully"
+        }
+    }
+
+    async createLessonExam(payload:CreateExamDto) {
+        const existLesson = await this.prisma.lessons.findUnique({where:{id:payload.lesson_id}});
+
+        if(!existLesson) 
+            throw new NotFoundException("lesson not found")
+
+        await this.prisma.exams.create({
+            data: {
+                question:payload.question,
+                lesson_id:payload.lesson_id,
+                variantA:payload.variantA,
+                variantB:payload.variantB,
+                variantC:payload.variantC,
+                variantD:payload.variantD,
+                answer:payload.answer
+            }
+        })
+
+        return {
+            success:true,
+            message:"exam created successfully"
+        }
+    }
+
+    async getAllExams(page:number , limit:number) {
+        const exams = await this
+                            .prisma
+                            .exams
+                            .findMany(
+                                {
+                                    take:limit , 
+                                    skip:limit * (page - 1)
+                                });
+        return {
+            success:true,
+            data:exams
+        }
+    }
+
+    async getOneExam(id:number) {
+        const existExam = await this.prisma.exams.findUnique({where:{id}});
+
+        if(!existExam)
+            throw new NotFoundException("exam not found")
+        return {
+            success:true,
+            data:existExam
+        }
+    }
+
+    async deleteExam(id:number) {
+        const existExam = await this.prisma.exams.findUnique({where:{id}});
+
+        if(!existExam)
+            throw new NotFoundException("exam not found")
+        
+        await this.prisma.exams.delete({where:{id}});
+
+        return {
+            success:true,
+            message:"exam was deleted successfully"
+        }
+    }
+
+    async updateExam(payload:UpdateExamDto , id:number) {
+        const existExam = await this.prisma.exams.findUnique({where:{id}});
+
+        if(!existExam) 
+            throw new NotFoundException("exam not found")
+
+        const existLesson = payload.lesson_id ? await this.prisma.lessons.findUnique({where:{id:payload.lesson_id}}) : true;
+
+        if(!existLesson)
+            throw new NotFoundException("lesson not found")
+
+        await this
+                .prisma
+                .exams
+                .update(
+                    {
+                        where:{
+                            id
+                        },
+                        data: {
+                            lesson_id: payload.lesson_id ? payload.lesson_id : existExam.lesson_id,
+                            question: payload.question ? payload.question : existExam.question,
+                            variantA:payload.variantA ? payload.variantA : existExam.variantA,
+                            variantB:payload.variantA ? payload.variantA : existExam.variantB,
+                            variantC:payload.variantA ? payload.variantA : existExam.variantC,
+                            variantD:payload.variantA ? payload.variantA : existExam.variantD,
+                            answer:payload.answer ? payload.answer : existExam.answer
+                        }
+                    }
+                )
+
+        return {
+            success:true,
+            message:"exam updated successfully"
         }
     }
 }

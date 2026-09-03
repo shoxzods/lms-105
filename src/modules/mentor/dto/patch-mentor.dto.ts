@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger"
-import { IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString, Max, MaxLength, Min, MinLength } from "class-validator"
+import { IsNumber, IsOptional, IsPhoneNumber, IsString, Max, MaxLength, Min, MinLength } from "class-validator"
 
 export class PatchMentorDto {
     @ApiProperty({example:"primov shoxzod"})

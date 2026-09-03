@@ -1,10 +1,11 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { UserRoles } from '@prisma/client';
-import { Roles } from 'src/common/decorators/role';
-import { AuthGuard } from 'src/common/guards/auth.guard';
-import { RoleGuard } from 'src/common/guards/role.guard';
+import { Roles } from '../../common/decorators/role';
+import { AuthGuard } from '../../common/guards/auth.guard';
+import { RoleGuard } from '../../common/guards/role.guard';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @ApiBearerAuth()
 @Controller('users')
@@ -26,7 +27,15 @@ export class UsersController {
     @Get("info")
     async getUserInfo(@Req() req:{user:{id:number}}) {
         const message = await this.userService.getUserInfo(req.user.id)
-
         return message
     }
+
+    @ApiOperation({summary:`${UserRoles.SUPERADMIN} , ${UserRoles.ADMIN} , ${UserRoles.TEACHER} , ${UserRoles.ASSISTANT} , ${UserRoles.STUDENT}`})
+    @Roles(UserRoles.SUPERADMIN , UserRoles.ADMIN , UserRoles.TEACHER , UserRoles.ASSISTANT , UserRoles.STUDENT)
+    @UseGuards(AuthGuard , RoleGuard)
+    @Post("security")
+    async changeUserPassword( @Body() payloud:UpdatePasswordDto, @Req() req:{user:{id:number}}) {
+        return await this.userService.changeUserPassword(payloud , req.user.id)
+    }
+
 }
