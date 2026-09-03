@@ -26,6 +26,15 @@ async function bootstrap() {
 
   app.setGlobalPrefix("/api/v1"); //xamma endpointlani oldiga qoyib beradi!
 
+  app.enableCors({
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "https://lms-n105-frontend.vercel.app",
+    ],
+    credentials: true,
+  });
+
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, documentFactory);
 
