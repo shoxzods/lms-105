@@ -1,0 +1,27 @@
+# Windowsda o'rnatilgan paketlar Linux konteynerda ishlamaydi —
+# image ichida `npm install` o'zi o'rnatgani qolishi kerak
+node_modules
+
+# Build natijasi konteyner ichida qaytadan yasaladi
+dist
+*.tsbuildinfo
+
+# Sirlar image ichiga tikilmasin — ular compose orqali beriladi
+.env
+.env.*
+
+# Yuklangan fayllar volume orqali ulanadi
+src/uploads
+
+.git
+.gitignore
+.vscode
+.idea
+
+test
+coverage
+*.md
+
+Dockerfile
+.dockerignore
+docker-compose.yml

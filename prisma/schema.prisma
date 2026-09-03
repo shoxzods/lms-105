@@ -1,0 +1,263 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  SUPERADMIN
+  ADMIN
+  TEACHER
+  ASSISTANT
+  STUDENT
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+  PENDING
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  REJECTED
+}
+
+enum CourseLevel {
+  BEGINNER
+  ELEMENTARY
+  PRE_INTERMEDIATE
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum Answer {
+  variantA
+  variantB
+  variantC
+  variantD
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  full_name String
+  phone     String   @unique
+  password  String
+  email     String?  @unique
+  file      String?
+  image     String?
+  role      UserRole
+  status    Status   @default(ACTIVE)
+  create_at DateTime @default(now())
+  update_at DateTime @updatedAt
+
+  mentorProfile    MentorProfile[]
+  courses          Courses[]
+  telegramOtps     TelegramOtp[]
+  resetPasses      ResetPass[]
+  purchasedCourses PurchasedCourse[]
+  chatsSent        ChatMessage[]     @relation("ChatSender")
+
+  @@map("users")
+}
+
+model TelegramOtp {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  otp        String
+  expires_at DateTime
+  verified   Boolean  @default(false)
+  create_at  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("telegram_otps")
+}
+
+model ResetPass {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  otp        String
+  expires_at DateTime
+  create_at  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("reset_passes")
+}
+
+model MentorProfile {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  experience  Float?
+  job         String?
+  web_link    String?
+  description String?
+  facebook    String?
+  telegram    String?
+  linkedin    String?
+  instagram   String?
+  github      String?
+  create_at   DateTime @default(now())
+  update_at   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  courses Courses[]
+
+  @@map("mentor_profile")
+}
+
+model Categories {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  create_at DateTime @default(now())
+  update_at DateTime @updatedAt
+
+  courses Courses[]
+
+  @@map("categories")
+}
+
+model Courses {
+  id          Int         @id @default(autoincrement())
+  assistantId Int?
+  mentorId    Int
+  name        String      @unique
+  banner      String
+  intro_video String
+  description String
+  price       Decimal
+  categoryId  Int
+  level       CourseLevel
+  published   Boolean     @default(true)
+  create_at   DateTime    @default(now())
+  update_at   DateTime    @updatedAt
+
+  categories    Categories    @relation(fields: [categoryId], references: [id])
+  user          User?         @relation(fields: [assistantId], references: [id])
+  mentorProfile MentorProfile @relation(fields: [mentorId], references: [id])
+
+  sections         Sections[]
+  purchasedCourses PurchasedCourse[]
+  chatMessages     ChatMessage[]
+
+  @@map("courses")
+}
+
+model PurchasedCourse {
+  courseId  Int
+  userId    Int
+  price     Decimal
+  status    PaymentStatus @default(PENDING)
+  create_at DateTime      @default(now())
+  update_at DateTime      @updatedAt
+
+  courses Courses @relation(fields: [courseId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@id([userId, courseId])
+  @@map("purchased_courses")
+}
+
+model Sections {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  courseId  Int
+  create_at DateTime @default(now())
+  update_at DateTime @updatedAt
+
+  courses Courses   @relation(fields: [courseId], references: [id])
+  lessons Lessons[]
+
+  @@map("sections")
+}
+
+model Lessons {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  sectionId   Int
+  description String
+  file        String
+  create_at   DateTime @default(now())
+  update_at   DateTime @updatedAt
+
+  sections  Sections    @relation(fields: [sectionId], references: [id])
+  materials Materials[]
+  homeworks Homeworks[]
+  exams     Exam[]
+
+  @@map("lessons")
+}
+
+model Materials {
+  id          Int      @id @default(autoincrement())
+  lessonId    Int
+  description String
+  create_at   DateTime @default(now())
+  update_at   DateTime @updatedAt
+
+  lessons       Lessons        @relation(fields: [lessonId], references: [id])
+  materialFiles MaterialFile[]
+
+  @@map("materials")
+}
+
+model MaterialFile {
+  id         Int    @id @default(autoincrement())
+  materialId Int
+  file       String
+
+  material Materials @relation(fields: [materialId], references: [id], onDelete: Cascade)
+
+  @@map("material_files")
+}
+
+model Homeworks {
+  id          Int      @id @default(autoincrement())
+  lessonId    Int
+  description String
+  file        String?
+  create_at   DateTime @default(now())
+  update_at   DateTime @updatedAt
+
+  lessons Lessons @relation(fields: [lessonId], references: [id])
+
+  @@map("homeworks")
+}
+
+model Exam {
+  id        Int      @id @default(autoincrement())
+  lessonId  Int
+  question  String
+  variantA  String
+  variantB  String
+  variantC  String
+  variantD  String
+  answer    Answer
+  create_at DateTime @default(now())
+  update_at DateTime @updatedAt
+
+  lessons Lessons @relation(fields: [lessonId], references: [id])
+
+  @@map("exam")
+}
+
+model ChatMessage {
+  id        Int      @id @default(autoincrement())
+  courseId  Int
+  senderId  Int
+  text      String
+  create_at DateTime @default(now())
+
+  courses Courses @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  sender  User    @relation("ChatSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([courseId, create_at])
+  @@map("chat_messages")
+}
