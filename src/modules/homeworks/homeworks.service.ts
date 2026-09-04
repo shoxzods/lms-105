@@ -232,14 +232,32 @@ export class HomeworksService {
       throw new BadRequestException("Kurs ID-sini aniqlab bo'lmadi");
     }
 
-    const homeworkId = dto.homeworkId ? Number(dto.homeworkId) : null;
+    let validHomeworkId: number | null = null;
+    const rawHwId = dto.homeworkId ? Number(dto.homeworkId) : null;
+    if (rawHwId && !isNaN(rawHwId)) {
+      const hw = await this.prisma.homeworks.findUnique({
+        where: { id: rawHwId },
+      });
+      if (hw) {
+        validHomeworkId = hw.id;
+      }
+    }
+
+    if (!validHomeworkId) {
+      const firstHw = await this.prisma.homeworks.findFirst({
+        where: { lessonId },
+      });
+      if (firstHw) {
+        validHomeworkId = firstHw.id;
+      }
+    }
 
     const submission = await this.prisma.homeworkSubmission.create({
       data: {
         userId,
         lessonId,
         courseId,
-        homeworkId: homeworkId && !isNaN(homeworkId) ? homeworkId : null,
+        homeworkId: validHomeworkId,
         file: fileName ?? null,
         text: dto.text ?? null,
         status: SubmissionStatus.PENDING,

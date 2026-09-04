@@ -86,13 +86,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
       };
     }
 
-    if (error.code === "P2003") {
+    if (error.code === "P2021") {
+      this.logger.error(`Prisma table missing (P2021): ${error.message}`);
       return {
-        status: HttpStatus.CONFLICT,
-        message: "Bu yozuvga boshqa ma'lumotlar bog'langan",
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: `Ma'lumotlar bazasi jadvali mavjud emas: ${error.meta?.table ?? ""}`,
       };
     }
 
+    this.logger.error(`Prisma error [${error.code}]: ${error.message}`);
     return {
       status: HttpStatus.BAD_REQUEST,
       message: "Ma'lumotlar bazasi so'rovi bajarilmadi",
