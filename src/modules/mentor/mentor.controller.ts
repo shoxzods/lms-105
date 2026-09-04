@@ -94,6 +94,32 @@ export class MentorController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.TEACHER)
   @ApiOperation({
+    summary: `${UserRole.TEACHER} - o'z kurslaridagi studentlar`,
+  })
+  @Get("my-students")
+  myStudents(
+    @CurrentUser() user: CurrentUserPayload,
+    @Query() query: { page?: number; limit?: number; search?: string },
+  ) {
+    return this.mentorService.myStudents(user, query);
+  }
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({
+    summary: `${UserRole.TEACHER} - o'z kurslaridagi assistentlar`,
+  })
+  @Get("my-assistants")
+  myAssistants(
+    @CurrentUser() user: CurrentUserPayload,
+    @Query() query: { page?: number; limit?: number; search?: string },
+  ) {
+    return this.mentorService.myAssistants(user, query);
+  }
+
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRole.TEACHER)
+  @ApiOperation({
     summary: `${UserRole.TEACHER} - o'z profilini tahrirlash`,
   })
   @Patch("profile")

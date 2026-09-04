@@ -28,4 +28,12 @@ export class QueryUserDto {
   @IsOptional()
   @IsString()
   search?: string;
+
+  /** Kurs ID bo'yicha filter — o'quvchilar uchun */
+  @ApiPropertyOptional({ example: 1 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  courseId?: number;
 }

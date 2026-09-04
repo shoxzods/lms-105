@@ -64,7 +64,7 @@ export class UsersService {
   }
 
   async findAll(query: QueryUserDto) {
-    const { page = 1, limit = 10, role, search } = query;
+    const { page = 1, limit = 10, role, search, courseId } = query;
     const skip = (page - 1) * limit;
 
     const where: Prisma.UserWhereInput = {};
@@ -79,6 +79,13 @@ export class UsersService {
         { phone: { contains: search } },
         { email: { contains: search, mode: "insensitive" } },
       ];
+    }
+
+    // courseId bo'yicha filter: faqat o'sha kursni sotib olgan studentlar
+    if (courseId) {
+      where.purchasedCourses = {
+        some: { courseId },
+      };
     }
 
     const [users, total] = await this.prisma.$transaction([
@@ -114,6 +121,7 @@ export class UsersService {
       },
     };
   }
+
 
   async findOne(id: number) {
     const user = await this.prisma.user.findUnique({

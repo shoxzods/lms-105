@@ -22,4 +22,12 @@ export class QueryAssistantDto {
   @IsOptional()
   @IsString()
   search?: string;
+
+  /** Kurs ID bo'yicha filter — mentor uchun */
+  @ApiPropertyOptional({ example: 1 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  courseId?: number;
 }

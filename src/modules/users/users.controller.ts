@@ -95,9 +95,9 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard, RoleGuard)
-  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
+  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
   @ApiOperation({
-    summary: `${UserRole.SUPERADMIN}, ${UserRole.ADMIN} - foydalanuvchilar royxati`,
+    summary: `${UserRole.SUPERADMIN}, ${UserRole.ADMIN}, ${UserRole.TEACHER} - foydalanuvchilar royxati`,
   })
   @Get()
   findAll(@Query() query: QueryUserDto) {
@@ -105,9 +105,9 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard, RoleGuard)
-  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
+  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
   @ApiOperation({
-    summary: `${UserRole.SUPERADMIN}, ${UserRole.ADMIN} - bitta foydalanuvchi`,
+    summary: `${UserRole.SUPERADMIN}, ${UserRole.ADMIN}, ${UserRole.TEACHER} - bitta foydalanuvchi`,
   })
   @Get(":id")
   findOne(@Param("id", ParseIntPipe) id: number) {

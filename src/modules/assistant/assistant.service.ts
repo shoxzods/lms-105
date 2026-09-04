@@ -76,7 +76,7 @@ export class AssistantService {
   }
 
   async findAll(query: QueryAssistantDto) {
-    const { page = 1, limit = 10, search } = query;
+    const { page = 1, limit = 10, search, courseId } = query;
     const skip = (page - 1) * limit;
 
     const where: Prisma.UserWhereInput = { role: UserRole.ASSISTANT };
@@ -87,6 +87,12 @@ export class AssistantService {
         { phone: { contains: search } },
         { email: { contains: search, mode: "insensitive" } },
       ];
+    }
+
+    if (courseId) {
+      where.courses = {
+        some: { id: courseId },
+      };
     }
 
     const [assistant, total] = await this.prisma.$transaction([
