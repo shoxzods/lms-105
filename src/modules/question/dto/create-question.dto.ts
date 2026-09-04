@@ -4,20 +4,35 @@ import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreateQuestionDto {
   @ApiProperty({ example: 1, description: "Kurs ID-si" })
-  @Transform(({ value }) => Number(value))
+  @Transform(({ value }) =>
+    value !== undefined && value !== null && value !== ""
+      ? Number(value)
+      : value,
+  )
   courseId!: number;
 
   @ApiPropertyOptional({ example: 1, description: "Bo'lim ID-si" })
   @IsOptional()
-  @Transform(({ value }) => (value ? Number(value) : undefined))
+  @Transform(({ value }) =>
+    value !== undefined && value !== null && value !== ""
+      ? Number(value)
+      : undefined,
+  )
   sectionId?: number;
 
   @ApiPropertyOptional({ example: 1, description: "Dars ID-si" })
   @IsOptional()
-  @Transform(({ value }) => (value ? Number(value) : undefined))
+  @Transform(({ value }) =>
+    value !== undefined && value !== null && value !== ""
+      ? Number(value)
+      : undefined,
+  )
   lessonId?: number;
 
-  @ApiProperty({ example: "DOM hususiyatlarini barchasini ro'yxati bormi sizda?", description: "Savol matni" })
+  @ApiProperty({
+    example: "DOM hususiyatlarini barchasini ro'yxati bormi sizda?",
+    description: "Savol matni",
+  })
   @IsNotEmpty({ message: "Savol matni kiritilishi shart" })
   @IsString()
   question!: string;

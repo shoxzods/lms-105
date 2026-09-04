@@ -1,4 +1,9 @@
-import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { Prisma, QuestionStatus, UserRole } from "@prisma/client";
 import { PrismaService } from "src/core/database/prisma.service";
 import { Actor, CourseOwner } from "src/common/services/course-owner.service";
@@ -37,20 +42,33 @@ export class QuestionService {
   ) {}
 
   async create(userId: number, dto: CreateQuestionDto, fileName?: string) {
+    const rawCourseId = dto.courseId ?? (dto as any).course_id;
+    const courseId = Number(rawCourseId);
+
+    if (!courseId || isNaN(courseId)) {
+      throw new BadRequestException("Kurs ID-si noto'g'ri yoki kiritilmagan");
+    }
+
     const course = await this.prisma.courses.findUnique({
-      where: { id: dto.courseId },
+      where: { id: courseId },
     });
 
     if (!course) {
       throw new NotFoundException("Kurs topilmadi");
     }
 
+    const rawSectionId = dto.sectionId ?? (dto as any).section_id;
+    const sectionId = rawSectionId ? Number(rawSectionId) : null;
+
+    const rawLessonId = dto.lessonId ?? (dto as any).lesson_id;
+    const lessonId = rawLessonId ? Number(rawLessonId) : null;
+
     return this.prisma.question.create({
       data: {
         userId,
-        courseId: dto.courseId,
-        sectionId: dto.sectionId ?? null,
-        lessonId: dto.lessonId ?? null,
+        courseId,
+        sectionId: sectionId && !isNaN(sectionId) ? sectionId : null,
+        lessonId: lessonId && !isNaN(lessonId) ? lessonId : null,
         question: dto.question,
         file: fileName ?? null,
         status: QuestionStatus.PENDING,
