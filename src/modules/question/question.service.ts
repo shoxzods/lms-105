@@ -157,7 +157,9 @@ export class QuestionService {
     } else if (actor.role === UserRole.ASSISTANT) {
       where.course = { assistantId: actor.id };
     } else if (actor.role === UserRole.STUDENT) {
-      where.userId = actor.id;
+      if (!query.courseId) {
+        where.userId = actor.id;
+      }
     }
 
     const [items, total] = await Promise.all([
