@@ -64,7 +64,12 @@ export class QuestionService {
     });
   }
 
-  async answer(id: number, actor: Actor, dto: AnswerQuestionDto, answerFileName?: string) {
+  async answer(
+    id: number,
+    actor: Actor,
+    dto: AnswerQuestionDto,
+    answerFileName?: string,
+  ) {
     const question = await this.prisma.question.findUnique({
       where: { id },
       include: { course: true },
@@ -108,7 +113,7 @@ export class QuestionService {
         },
       });
     } catch {
-      // Ignore if chat creation fails
+      // Ignore if chat message record creation fails
     }
 
     return updated;
