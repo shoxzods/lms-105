@@ -46,6 +46,11 @@ enum ExamStatus {
   FAILED
 }
 
+enum QuestionStatus {
+  PENDING
+  ANSWERED
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   full_name String
@@ -66,6 +71,7 @@ model User {
   purchasedCourses PurchasedCourse[]
   chatsSent        ChatMessage[]     @relation("ChatSender")
   examResults      ExamResult[]
+  questions        Question[]
 
   @@map("users")
 }
@@ -152,6 +158,7 @@ model Courses {
   sections         Sections[]
   purchasedCourses PurchasedCourse[]
   chatMessages     ChatMessage[]
+  questions        Question[]
 
   @@map("courses")
 }
@@ -180,6 +187,7 @@ model Sections {
 
   courses Courses   @relation(fields: [courseId], references: [id])
   lessons Lessons[]
+  questions Question[]
 
   @@map("sections")
 }
@@ -198,6 +206,7 @@ model Lessons {
   homeworks   Homeworks[]
   exams       Exam[]
   examResults ExamResult[]
+  questions   Question[]
 
   @@map("lessons")
 }
@@ -289,4 +298,30 @@ model ChatMessage {
 
   @@index([courseId, create_at])
   @@map("chat_messages")
+}
+
+model Question {
+  id         Int            @id @default(autoincrement())
+  userId     Int
+  courseId   Int
+  sectionId  Int?
+  lessonId   Int?
+  question   String
+  answer     String?
+  file       String?
+  answerFile String?
+  status     QuestionStatus @default(PENDING)
+  create_at  DateTime       @default(now())
+  update_at  DateTime       @updatedAt
+
+  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course  Courses   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  section Sections? @relation(fields: [sectionId], references: [id], onDelete: SetNull)
+  lesson  Lessons?  @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([courseId])
+  @@index([status])
+  @@index([create_at])
+  @@map("questions")
 }

@@ -68,10 +68,23 @@ export class ChatService {
   }
 
   async save(courseId: number, senderId: number, text: string) {
-    return this.prisma.chatMessage.create({
+    const message = await this.prisma.chatMessage.create({
       data: { courseId, senderId, text },
       include: { sender: senderSelect },
     });
+
+    if (message.sender.role === UserRole.STUDENT) {
+      await this.prisma.question.create({
+        data: {
+          userId: senderId,
+          courseId,
+          question: text,
+          status: "PENDING",
+        },
+      });
+    }
+
+    return message;
   }
 
   async rooms(actor: Actor) {

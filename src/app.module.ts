@@ -23,6 +23,7 @@ import { PaymentsModule } from "./modules/payments/payments.module";
 import { BotModule } from "./modules/bot/bot.module";
 import { ChatModule } from "./modules/chat/chat.module";
 import { DashboardModule } from "./modules/dashboard/dashboard.module";
+import { QuestionModule } from "./modules/question/question.module";
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { DashboardModule } from "./modules/dashboard/dashboard.module";
     BotModule,
     ChatModule,
     DashboardModule,
+    QuestionModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: HttpThrottlerGuard }],
 })
