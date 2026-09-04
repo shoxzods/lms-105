@@ -180,7 +180,7 @@ export class HomeworksService {
 
     return {
       success: true,
-      message: "Homework update successfully!",
+      message: "Homework updated successfully!",
       data: homework,
     };
   }
@@ -272,7 +272,7 @@ export class HomeworksService {
 
     return {
       success: true,
-      message: "Vazifa muvaffaqiyatli topshirildi",
+      message: "Homework submitted successfully!",
       data: submission,
     };
   }
@@ -457,7 +457,7 @@ export class HomeworksService {
 
     return {
       success: true,
-      message: "Vazifa muvaffaqiyatli baholandi",
+      message: "Homework graded successfully!",
       data: updated,
     };
   }
@@ -493,7 +493,7 @@ export class HomeworksService {
 
     return {
       success: true,
-      message: "Topshirilgan vazifa o'chirildi",
+      message: "Homework submission deleted successfully!",
     };
   }
 }

@@ -28,7 +28,7 @@ export class CategoriesController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
   @ApiOperation({
-    summary: `${UserRole.SUPERADMIN}, ${UserRole.ADMIN} - kategoriya qo'shish`,
+    summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN}] Create a category`,
   })
   @Post()
   create(@Body() payload: CreateCategoryDto) {
@@ -37,7 +37,7 @@ export class CategoriesController {
 
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
-  @ApiOperation({ summary: "Kategoriyalar royhati" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Get list of categories` })
   @Get()
   findAll(@Query() query: QueryCategoryDto) {
     return this.categoriesService.findAll(query);
@@ -45,7 +45,7 @@ export class CategoriesController {
 
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
-  @ApiOperation({ summary: "Bitta kategoriya" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Get a single category` })
   @Get(":id")
   findOne(@Param("id", ParseIntPipe) id: number) {
     return this.categoriesService.findOne(id);
@@ -53,7 +53,7 @@ export class CategoriesController {
 
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
-  @ApiOperation({ summary: "Kategoriyani tahrirlash" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN}] Update a category` })
   @Patch(":id")
   update(
     @Param("id", ParseIntPipe) id: number,
@@ -64,7 +64,7 @@ export class CategoriesController {
 
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN)
-  @ApiOperation({ summary: `${UserRole.SUPERADMIN} - kategoriyani o'chirish` })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN}] Delete a category` })
   @Delete(":id")
   remove(@Param("id", ParseIntPipe) id: number) {
     return this.categoriesService.remove(id);

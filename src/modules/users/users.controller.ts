@@ -39,7 +39,7 @@ export class UsersController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
   @ApiOperation({
-    summary: `${UserRole.SUPERADMIN} ${UserRole.ADMIN}`,
+    summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN}] Create a new admin user`,
   })
   @ApiConsumes("multipart/form-data")
   @ApiBody({
@@ -82,9 +82,9 @@ export class UsersController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
   @ApiOperation({
-    summary: `${UserRole.SUPERADMIN}, ${UserRole.ADMIN}`,
+    summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN}] Update a user`,
     description:
-      "Superadmin admin va studentni, admin faqat studentni tahrirlaydi. Har kim o'z profilini tahrirlay oladi.",
+      "SUPERADMIN can update admins and students. ADMIN can only update students. Each user can edit their own profile.",
   })
   updateAdmin(
     @Body() payload: UpdateAdminDto,
@@ -97,7 +97,7 @@ export class UsersController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
   @ApiOperation({
-    summary: `${UserRole.SUPERADMIN}, ${UserRole.ADMIN}, ${UserRole.TEACHER} - foydalanuvchilar royxati`,
+    summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Get list of users`,
   })
   @Get()
   findAll(@Query() query: QueryUserDto) {
@@ -107,7 +107,7 @@ export class UsersController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
   @ApiOperation({
-    summary: `${UserRole.SUPERADMIN}, ${UserRole.ADMIN}, ${UserRole.TEACHER} - bitta foydalanuvchi`,
+    summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Get a single user`,
   })
   @Get(":id")
   findOne(@Param("id", ParseIntPipe) id: number) {
@@ -117,7 +117,7 @@ export class UsersController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN)
   @ApiOperation({
-    summary: `${UserRole.SUPERADMIN} - adminni ochirish`,
+    summary: `[${UserRole.SUPERADMIN}] Delete a user`,
   })
   @Delete(":id")
   remove(@Param("id", ParseIntPipe) id: number, @Req() req: Request) {

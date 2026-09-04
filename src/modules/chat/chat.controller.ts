@@ -9,13 +9,13 @@ import { ChatService } from "./chat.service";
 export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
-  @ApiOperation({ summary: "Foydalanuvchi kira oladigan kurs xonalari" })
+  @ApiOperation({ summary: "[All authenticated users] Get chat rooms accessible to the user" })
   @Get("rooms")
   async rooms(@Req() req: Request) {
     return { success: true, data: await this.chatService.rooms(req["user"]) };
   }
 
-  @ApiOperation({ summary: "Kurs suhbati tarixi" })
+  @ApiOperation({ summary: "[All authenticated users] Get chat history for a course" })
   @Get(":courseId")
   async history(
     @Param("courseId", ParseIntPipe) courseId: number,

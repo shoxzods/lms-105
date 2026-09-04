@@ -14,25 +14,25 @@ import { PublicService } from "./public.service";
 export class PublicController {
   constructor(private readonly publicService: PublicService) {}
 
-  @ApiOperation({ summary: "Ochiq kurslar ro'yxati (token kerak emas)" })
+  @ApiOperation({ summary: "[Public] Get list of public courses (no token required)" })
   @Get("courses")
   courses(@Query() query: QueryPublicCourseDto) {
     return this.publicService.courses(query);
   }
 
-  @ApiOperation({ summary: "Bitta kurs (token kerak emas)" })
+  @ApiOperation({ summary: "[Public] Get a single course (no token required)" })
   @Get("courses/:id")
   courseById(@Param("id", ParseIntPipe) id: number) {
     return this.publicService.courseById(id);
   }
 
-  @ApiOperation({ summary: "Kategoriyalar (token kerak emas)" })
+  @ApiOperation({ summary: "[Public] Get categories (no token required)" })
   @Get("categories")
   categories() {
     return this.publicService.categories();
   }
 
-  @ApiOperation({ summary: "Mentorlar (token kerak emas)" })
+  @ApiOperation({ summary: "[Public] Get mentors (no token required)" })
   @Get("mentors")
   mentors() {
     return this.publicService.mentors();

@@ -16,14 +16,14 @@ export class DashboardController {
 
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
-  @ApiOperation({ summary: "Boshqaruv paneli umumiy sanoqlari" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN}] Get dashboard stats` })
   @Get("stats")
   async stats() {
     return { success: true, data: await this.dashboardService.stats() };
   }
 
   @UseGuards(AuthGuard)
-  @ApiOperation({ summary: "Bildirishnoma sanoqlari" })
+  @ApiOperation({ summary: "[All authenticated users] Get notification counts" })
   @Get("notifications")
   async notifications(
     @CurrentUser() user: CurrentUserPayload,

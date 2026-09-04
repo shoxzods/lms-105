@@ -42,8 +42,8 @@ export class MentorController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
   @ApiOperation({
-    summary: `${UserRole.SUPERADMIN}, ${UserRole.ADMIN}`,
-    description: "Bu api mentor qoshish uchun",
+    summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN}] Create a new mentor`,
+    description: "Creates a mentor profile and user account.",
   })
   @ApiConsumes("multipart/form-data")
   @ApiBody({
@@ -84,7 +84,7 @@ export class MentorController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.TEACHER)
   @ApiOperation({
-    summary: `${UserRole.TEACHER} - o'z profilini ko'rish`,
+    summary: `[${UserRole.TEACHER}] View own profile`,
   })
   @Get("profile")
   profile(@CurrentUser() user: CurrentUserPayload) {
@@ -94,7 +94,7 @@ export class MentorController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.TEACHER)
   @ApiOperation({
-    summary: `${UserRole.TEACHER} - o'z kurslaridagi studentlar`,
+    summary: `[${UserRole.TEACHER}] Get students enrolled in own courses`,
   })
   @Get("my-students")
   myStudents(
@@ -107,7 +107,7 @@ export class MentorController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.TEACHER)
   @ApiOperation({
-    summary: `${UserRole.TEACHER} - o'z kurslaridagi assistentlar`,
+    summary: `[${UserRole.TEACHER}] Get assistants assigned to own courses`,
   })
   @Get("my-assistants")
   myAssistants(
@@ -120,7 +120,7 @@ export class MentorController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.TEACHER)
   @ApiOperation({
-    summary: `${UserRole.TEACHER} - o'z profilini tahrirlash`,
+    summary: `[${UserRole.TEACHER}] Update own profile`,
   })
   @Patch("profile")
   updateProfile(
@@ -132,7 +132,7 @@ export class MentorController {
 
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
-  @ApiOperation({ summary: "Mentorlar royhati" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN}] Get list of mentors` })
   @Get()
   findAll(@Query() query: QueryMentorDto) {
     return this.mentorService.findAll(query);
@@ -140,7 +140,7 @@ export class MentorController {
 
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
-  @ApiOperation({ summary: "Bitta mentor" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN}] Get a single mentor` })
   @Get(":id")
   findOne(@Param("id", ParseIntPipe) id: number) {
     return this.mentorService.findOne(id);
@@ -149,7 +149,7 @@ export class MentorController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
   @ApiOperation({
-    summary: `${UserRole.SUPERADMIN}, ${UserRole.ADMIN} - mentorni tahrirlash`,
+    summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN}] Update a mentor`,
   })
   @ApiConsumes("multipart/form-data")
   @ApiBody({
@@ -193,7 +193,7 @@ export class MentorController {
 
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN)
-  @ApiOperation({ summary: `${UserRole.SUPERADMIN} - mentorni o'chirish` })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN}] Delete a mentor` })
   @Delete(":id")
   remove(@Param("id", ParseIntPipe) id: number) {
     return this.mentorService.remove(id);

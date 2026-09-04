@@ -31,8 +31,8 @@ export class SectionsController {
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
   @ApiOperation({
-    summary: "Bo'lim qo'shish",
-    description: "Mentor faqat o'z kursiga qo'sha oladi.",
+    summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Create a new section`,
+    description: "Teachers can only add sections to their own courses.",
   })
   @Post()
   create(@Body() payload: CreateSectionDto, @Req() req: Request) {
@@ -41,7 +41,7 @@ export class SectionsController {
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
   @CourseAccess("course")
-  @ApiOperation({ summary: "Bo'limlar ro'yhati" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER} | ${UserRole.STUDENT}] Get list of sections` })
   @Get()
   findAll(@Query() query: QuerySectionDto, @Req() req: Request) {
     return this.sectionsService.findAll(query, req["user"]);
@@ -49,14 +49,14 @@ export class SectionsController {
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
   @CourseAccess("section")
-  @ApiOperation({ summary: "Bitta bo'lim" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER} | ${UserRole.STUDENT}] Get a single section` })
   @Get(":id")
   findOne(@Param("id", ParseIntPipe) id: number) {
     return this.sectionsService.findOne(id);
   }
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
-  @ApiOperation({ summary: "Bo'limni tahrirlash" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Update a section` })
   @Patch(":id")
   update(
     @Param("id", ParseIntPipe) id: number,
@@ -67,7 +67,7 @@ export class SectionsController {
   }
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
-  @ApiOperation({ summary: "Bo'limni o'chirish" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Delete a section` })
   @Delete(":id")
   remove(@Param("id", ParseIntPipe) id: number, @Req() req: Request) {
     return this.sectionsService.remove(id, req["user"]);

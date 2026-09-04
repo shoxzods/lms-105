@@ -33,7 +33,7 @@ export class ExamController {
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
   @CourseAccess("lesson")
-  @ApiOperation({ summary: "Test savoli qo'shish" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Add an exam question` })
   @Post()
   create(@Body() payload: CreateExamDto, @Req() req: Request) {
     return this.examService.create(payload, req["user"]);
@@ -41,7 +41,7 @@ export class ExamController {
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
   @CourseAccess("lesson")
-  @ApiOperation({ summary: "Test savollari ro'yxati" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER} | ${UserRole.STUDENT}] Get list of exam questions` })
   @Get()
   findAll(@Query() query: QueryExamDto, @Req() req: Request) {
     return this.examService.findAll(query, req["user"]);
@@ -50,7 +50,7 @@ export class ExamController {
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
   @CourseAccess("lesson")
   @ApiOperation({
-    summary: "Javoblarni tekshirish, ball olish va natijani saqlash",
+    summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER} | ${UserRole.STUDENT}] Submit answers and get score`,
   })
   @Post("check")
   check(@Body() payload: CheckExamDto, @Req() req: Request) {
@@ -61,7 +61,7 @@ export class ExamController {
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
   @ApiOperation({
-    summary: "Barcha talabalar natijalari (Admin / Superadmin / Mentor)",
+    summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Get all students' exam results`,
   })
   @Get("results")
   findAllResults(@Query() query: QueryExamResultDto, @Req() req: Request) {
@@ -69,21 +69,21 @@ export class ExamController {
   }
 
   @Roles(UserRole.STUDENT)
-  @ApiOperation({ summary: "O'quvchining o'z imtihon natijalari tarixi" })
+  @ApiOperation({ summary: `[${UserRole.STUDENT}] Get my own exam results history` })
   @Get("results/my")
   findMyResults(@Query() query: QueryExamResultDto, @Req() req: Request) {
     return this.examService.findMyResults(query, req["user"]);
   }
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
-  @ApiOperation({ summary: "Imtihon natijalari statistikasi" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Get exam results statistics` })
   @Get("results/stats")
   getResultStats(@Req() req: Request) {
     return this.examService.getResultStats(req["user"]);
   }
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
-  @ApiOperation({ summary: "Bitta imtihon natijasi va batafsil javoblar" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER} | ${UserRole.STUDENT}] Get a single exam result with details` })
   @Get("results/:id")
   findOneResult(
     @Param("id", ParseIntPipe) id: number,
@@ -93,7 +93,7 @@ export class ExamController {
   }
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
-  @ApiOperation({ summary: "Imtihon natijasini o'chirish" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN}] Delete an exam result` })
   @Delete("results/:id")
   removeResult(
     @Param("id", ParseIntPipe) id: number,
@@ -106,7 +106,7 @@ export class ExamController {
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
   @CourseAccess("exam")
-  @ApiOperation({ summary: "Bitta test savoli" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER} | ${UserRole.STUDENT}] Get a single exam question` })
   @Get(":id")
   findOne(@Param("id", ParseIntPipe) id: number, @Req() req: Request) {
     return this.examService.findOne(id, req["user"]);
@@ -114,7 +114,7 @@ export class ExamController {
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
   @CourseAccess("exam")
-  @ApiOperation({ summary: "Test savolini tahrirlash" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Update an exam question` })
   @Patch(":id")
   update(
     @Param("id", ParseIntPipe) id: number,
@@ -126,7 +126,7 @@ export class ExamController {
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
   @CourseAccess("exam")
-  @ApiOperation({ summary: "Test savolini o'chirish" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Delete an exam question` })
   @Delete(":id")
   remove(@Param("id", ParseIntPipe) id: number, @Req() req: Request) {
     return this.examService.remove(id, req["user"]);

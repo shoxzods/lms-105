@@ -54,7 +54,7 @@ export class MaterialsController {
   constructor(private readonly materialsService: MaterialsService) {}
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
-  @ApiOperation({ summary: "Material qo'shish(10 tagacha fayl)" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Upload material files (up to 10 files)` })
   @ApiConsumes("multipart/form-data")
   @ApiBody({
     schema: {
@@ -87,7 +87,7 @@ export class MaterialsController {
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
   @CourseAccess("lesson")
-  @ApiOperation({ summary: "Materiallar ro'yhati" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER} | ${UserRole.STUDENT}] Get list of materials` })
   @Get()
   findAll(@Query() query: QueryMaterialDto, @Req() req: Request) {
     return this.materialsService.findAll(query, req["user"]);
@@ -95,14 +95,14 @@ export class MaterialsController {
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
   @CourseAccess("material")
-  @ApiOperation({ summary: "Bitta material" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER} | ${UserRole.STUDENT}] Get a single material` })
   @Get(":id")
   findOne(@Param("id", ParseIntPipe) id: number) {
     return this.materialsService.findOne(id);
   }
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
-  @ApiOperation({ summary: "Materialni tahrirlash (fayl qo'shiladi)" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Update a material (new files will be appended)` })
   @ApiConsumes("multipart/form-data")
   @ApiBody({
     schema: {
@@ -131,7 +131,7 @@ export class MaterialsController {
   }
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
-  @ApiOperation({ summary: "Materialdan bitta faylni o'chirish" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Remove a single file from material` })
   @Delete("file/:fileId")
   removeFile(
     @Param("fileId", ParseIntPipe) fileId: number,
@@ -141,7 +141,7 @@ export class MaterialsController {
   }
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
-  @ApiOperation({ summary: "Materialni o'chirish" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Delete a material` })
   @Delete(":id")
   remove(@Param("id", ParseIntPipe) id: number, @Req() req: Request) {
     return this.materialsService.remove(id, req["user"]);

@@ -56,8 +56,8 @@ export class LessonsController {
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
   @ApiOperation({
-    summary: "Dars qo'shish",
-    description: "Mentor faqat o'z kursining bo'limiga qo'sha oladi.",
+    summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Create a new lesson`,
+    description: "Teachers can only add lessons to sections belonging to their own courses.",
   })
   @ApiConsumes("multipart/form-data")
   @ApiBody({
@@ -91,7 +91,7 @@ export class LessonsController {
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
   @CourseAccess("section")
-  @ApiOperation({ summary: "Darslar ro'yhati" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER} | ${UserRole.STUDENT}] Get list of lessons` })
   @Get()
   findAll(@Query() query: QueryLessonDto, @Req() req: Request) {
     return this.lessonsService.findAll(query, req["user"]);
@@ -99,14 +99,14 @@ export class LessonsController {
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
   @CourseAccess("lesson")
-  @ApiOperation({ summary: "Bitta dars" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER} | ${UserRole.STUDENT}] Get a single lesson` })
   @Get(":id")
   findOne(@Param("id", ParseIntPipe) id: number) {
     return this.lessonsService.findOne(id);
   }
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
-  @ApiOperation({ summary: "Darsni tahrirlash" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Update a lesson` })
   @ApiConsumes("multipart/form-data")
   @ApiBody({
     schema: {
@@ -131,7 +131,7 @@ export class LessonsController {
   }
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
-  @ApiOperation({ summary: "Darsni o'chirish" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Delete a lesson` })
   @Delete(":id")
   remove(@Param("id", ParseIntPipe) id: number, @Req() req: Request) {
     return this.lessonsService.remove(id, req["user"]);

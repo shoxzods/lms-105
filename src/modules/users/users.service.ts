@@ -174,7 +174,7 @@ export class UsersService {
 
     return {
       success: true,
-      message: "Admin deleted successfully!",
+      message: "User deleted successfully!",
     };
   }
 
@@ -234,14 +234,25 @@ export class UsersService {
       }
     }
 
-    await this.prisma.user.update({
+    const updatedUser = await this.prisma.user.update({
       where: { id: id },
       data: payload,
+      select: {
+        id: true,
+        full_name: true,
+        phone: true,
+        email: true,
+        role: true,
+        file: true,
+        status: true,
+        create_at: true,
+      },
     });
 
     return {
       success: true,
-      message: "Update admin successfully!",
+      message: "User updated successfully!",
+      data: updatedUser,
     };
   }
 }

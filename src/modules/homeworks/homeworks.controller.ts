@@ -60,7 +60,7 @@ export class HomeworksController {
   /* ==================== Homework Management (O'qituvchi) ==================== */
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
-  @ApiOperation({ summary: "Vazifa berish" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Create a homework assignment` })
   @ApiConsumes("multipart/form-data")
   @ApiBody({
     schema: {
@@ -87,7 +87,7 @@ export class HomeworksController {
   }
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
-  @ApiOperation({ summary: "Vazifa ro'yhati" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER} | ${UserRole.STUDENT}] Get list of homework assignments` })
   @Get()
   findAll(@Query() query: QueryHomeworkDto, @Req() req: Request) {
     return this.homeworksService.findAll(query, req["user"]);
@@ -95,7 +95,7 @@ export class HomeworksController {
 
   /* ==================== Student Submission Endpoints ==================== */
 
-  @ApiOperation({ summary: "Talaba vazifa topshirishi (Submit homework)" })
+  @ApiOperation({ summary: `[${UserRole.STUDENT}] Submit a homework assignment` })
   @ApiConsumes("multipart/form-data")
   @UseInterceptors(homeworkUpload)
   @Post("submit")
@@ -108,7 +108,7 @@ export class HomeworksController {
     return this.homeworksService.submit(userId, payload, file?.filename);
   }
 
-  @ApiOperation({ summary: "Talabaning o'z topshirgan vazifalari" })
+  @ApiOperation({ summary: `[${UserRole.STUDENT}] Get my submitted assignments` })
   @Get("my-submissions")
   findMySubmissions(
     @Req() req: Request,
@@ -121,14 +121,14 @@ export class HomeworksController {
   /* ==================== Teacher / Admin Submissions Review & Grading ==================== */
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.ASSISTANT)
-  @ApiOperation({ summary: "Topshirilgan vazifalar ro'yxati (O'qituvchi/Admin)" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER} | ${UserRole.ASSISTANT}] Get list of submitted homeworks` })
   @Get("submissions")
   findSubmissions(@Req() req: Request, @Query() query: QuerySubmissionDto) {
     return this.homeworksService.findSubmissions(req["user"], query);
   }
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.ASSISTANT, UserRole.STUDENT)
-  @ApiOperation({ summary: "Bitta topshirilgan vazifani olish" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER} | ${UserRole.ASSISTANT} | ${UserRole.STUDENT}] Get a single submission` })
   @Get("submissions/:id")
   findOneSubmission(
     @Param("id", ParseIntPipe) id: number,
@@ -138,7 +138,7 @@ export class HomeworksController {
   }
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.ASSISTANT)
-  @ApiOperation({ summary: "Vazifani baholash (Grade submission)" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER} | ${UserRole.ASSISTANT}] Grade a submission` })
   @ApiConsumes("multipart/form-data")
   @UseInterceptors(homeworkUpload)
   @Post("submissions/:id/grade")
@@ -156,7 +156,7 @@ export class HomeworksController {
     );
   }
 
-  @ApiOperation({ summary: "Topshirilgan vazifani o'chirish" })
+  @ApiOperation({ summary: "[All authenticated users] Delete a submission" })
   @Delete("submissions/:id")
   removeSubmission(
     @Param("id", ParseIntPipe) id: number,
@@ -168,14 +168,14 @@ export class HomeworksController {
   /* ==================== Single Homework Routes ==================== */
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
-  @ApiOperation({ summary: "Bitta vazifa" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER} | ${UserRole.STUDENT}] Get a single homework assignment` })
   @Get(":id")
   findOne(@Param("id", ParseIntPipe) id: number) {
     return this.homeworksService.findOne(id);
   }
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
-  @ApiOperation({ summary: "Vazifani tahrirlash" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Update a homework assignment` })
   @ApiConsumes("multipart/form-data")
   @Patch(":id")
   @UseInterceptors(homeworkUpload)
@@ -194,7 +194,7 @@ export class HomeworksController {
   }
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
-  @ApiOperation({ summary: "Vazifani o'chirish" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Delete a homework assignment` })
   @Delete(":id")
   remove(@Param("id", ParseIntPipe) id: number, @Req() req: Request) {
     return this.homeworksService.remove(id, req["user"]);

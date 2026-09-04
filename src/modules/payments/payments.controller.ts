@@ -29,9 +29,9 @@ export class PaymentsController {
 
   @Roles(UserRole.STUDENT, UserRole.SUPERADMIN, UserRole.ADMIN)
   @ApiOperation({
-    summary: "Kursga to'lov qilish",
+    summary: `[${UserRole.STUDENT} | ${UserRole.SUPERADMIN} | ${UserRole.ADMIN}] Create a payment for a course`,
     description:
-      "Student o'ziga to'lov qiladi. Admin `userId` va `status` yuborib, boshqa student nomidan qo'sha oladi.",
+      "Students pay for themselves. Admin can provide userId and status to add payment on behalf of another student.",
   })
   @Post()
   create(@Body() payload: CreatePaymentDto, @Req() req: Request) {
@@ -39,21 +39,21 @@ export class PaymentsController {
   }
 
   @Roles(UserRole.STUDENT)
-  @ApiOperation({ summary: "O'z to'lovlarim" })
+  @ApiOperation({ summary: `[${UserRole.STUDENT}] Get my own payments` })
   @Get("my")
   findMy(@CurrentUser("id") userId: number) {
     return this.paymentsService.findMy(userId);
   }
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
-  @ApiOperation({ summary: "Barcha to'lovlar (Admin/Teacher)" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Get all payments` })
   @Get()
   findAll(@Query() query: QueryPaymentDto, @Req() req: Request) {
     return this.paymentsService.findAll(query, req["user"]);
   }
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
-  @ApiOperation({ summary: "To'lovni tasdiqlash yoki rad etish" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Approve or reject a payment` })
   @Patch(":userId/:courseId")
   updateStatus(
     @Param("userId", ParseIntPipe) userId: number,

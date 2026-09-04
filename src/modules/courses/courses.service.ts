@@ -305,7 +305,7 @@ export class CoursesService {
 
     return {
       success: true,
-      message: "Course update successfully!",
+      message: "Course updated successfully!",
       data: course,
     };
   }

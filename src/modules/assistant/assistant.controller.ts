@@ -64,7 +64,7 @@ export class AssistantController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
   @ApiOperation({
-    summary: `${UserRole.SUPERADMIN}, ${UserRole.ADMIN}, ${UserRole.TEACHER} - assistent qo'shish`,
+    summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Create an assistant`,
   })
   @ApiConsumes("multipart/form-data")
   @ApiBody({
@@ -123,7 +123,7 @@ export class AssistantController {
     UserRole.TEACHER,
   )
   @ApiOperation({
-    summary: "Assistentlar ro'yhati",
+    summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Get list of assistants`,
   })
   @Get()
   findAll(@Query() query: QueryAssistantDto) {
@@ -133,7 +133,7 @@ export class AssistantController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
   @ApiOperation({
-    summary: "Bitta assistent",
+    summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Get a single assistant`,
   })
   @Get(":id")
   findOne(
@@ -145,7 +145,7 @@ export class AssistantController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
   @ApiOperation({
-    summary: "Assistentni tahrirlash",
+    summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Update an assistant`,
   })
   @ApiConsumes("multipart/form-data")
   @ApiBody({
@@ -185,7 +185,7 @@ export class AssistantController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN)
   @ApiOperation({
-    summary: `${UserRole.SUPERADMIN} - assistentni o'chirish`,
+    summary: `[${UserRole.SUPERADMIN}] Delete an assistant`,
   })
   @Delete(":id")
   remove(

@@ -40,9 +40,9 @@ export class CoursesController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
   @ApiOperation({
-    summary: `${UserRole.SUPERADMIN}, ${UserRole.ADMIN}, ${UserRole.TEACHER} - kurs qo'shish`,
+    summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Create a new course`,
     description:
-      "Mentor yaratsa mentorId tokendan olinadi, admin yaratsa bodydan keladi.",
+      "If a Teacher creates the course, mentorId is taken from the token. If an Admin creates it, mentorId comes from the request body.",
   })
   @ApiConsumes("multipart/form-data")
   @ApiBody({
@@ -140,8 +140,8 @@ export class CoursesController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
   @ApiOperation({
-    summary: "Kurslar royhati",
-    description: "Mentor faqat o'zining kurslarini ko'radi.",
+    summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Get list of courses`,
+    description: "Teachers only see their own courses.",
   })
   @Get()
   findAll(@Query() query: QueryCourseDto, @Req() req: Request) {
@@ -150,7 +150,7 @@ export class CoursesController {
 
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
-  @ApiOperation({ summary: "Bitta kurs" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Get a single course` })
   @Get(":id")
   findOne(@Param("id", ParseIntPipe) id: number, @Req() req: Request) {
     return this.coursesService.findOne(id, req["user"]);
@@ -158,7 +158,7 @@ export class CoursesController {
 
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
-  @ApiOperation({ summary: "Kursni tahrirlash" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER}] Update a course` })
   @ApiConsumes("multipart/form-data")
   @ApiBody({
     schema: {
@@ -237,7 +237,7 @@ export class CoursesController {
 
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.SUPERADMIN)
-  @ApiOperation({ summary: `${UserRole.SUPERADMIN} - kursni o'chirish` })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN}] Delete a course` })
   @Delete(":id")
   remove(@Param("id", ParseIntPipe) id: number) {
     return this.coursesService.remove(id);

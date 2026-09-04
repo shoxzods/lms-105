@@ -51,7 +51,7 @@ const fileUploadOptions = {
 export class QuestionController {
   constructor(private readonly questionService: QuestionService) {}
 
-  @ApiOperation({ summary: "Savol berish (Student/Foydalanuvchi)" })
+  @ApiOperation({ summary: `[${UserRole.STUDENT} | All authenticated users] Ask a question` })
   @ApiConsumes("multipart/form-data")
   @UseInterceptors(FileInterceptor("file", fileUploadOptions))
   @Post()
@@ -62,11 +62,11 @@ export class QuestionController {
   ) {
     const userId = req["user"].id;
     const item = await this.questionService.create(userId, dto, file?.filename);
-    return { success: true, message: "Savol muvaffaqiyatli yuborildi", data: item };
+    return { success: true, message: "Question submitted successfully!", data: item };
   }
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.ASSISTANT)
-  @ApiOperation({ summary: "Savolga javob berish (O'qituvchi/Admin)" })
+  @ApiOperation({ summary: `[${UserRole.SUPERADMIN} | ${UserRole.ADMIN} | ${UserRole.TEACHER} | ${UserRole.ASSISTANT}] Answer a question` })
   @ApiConsumes("multipart/form-data")
   @UseInterceptors(FileInterceptor("file", fileUploadOptions))
   @Post(":id/answer")
@@ -77,27 +77,27 @@ export class QuestionController {
     @UploadedFile() file?: Express.Multer.File,
   ) {
     const item = await this.questionService.answer(id, req["user"], dto, file?.filename);
-    return { success: true, message: "Javob muvaffaqiyatli saqlandi", data: item };
+    return { success: true, message: "Answer submitted successfully!", data: item };
   }
 
-  @ApiOperation({ summary: "Savollar ro'yxatini olish" })
+  @ApiOperation({ summary: "[All authenticated users] Get list of questions" })
   @Get()
   async findAll(@Req() req: Request, @Query() query: QueryQuestionDto) {
     const res = await this.questionService.findAll(req["user"], query);
     return { success: true, data: res.items, meta: res.meta };
   }
 
-  @ApiOperation({ summary: "Bitta savolni olish" })
+  @ApiOperation({ summary: "[All authenticated users] Get a single question" })
   @Get(":id")
   async findOne(@Param("id", ParseIntPipe) id: number, @Req() req: Request) {
     const item = await this.questionService.findOne(id, req["user"]);
     return { success: true, data: item };
   }
 
-  @ApiOperation({ summary: "Savolni o'chirish" })
+  @ApiOperation({ summary: "[All authenticated users] Delete a question" })
   @Delete(":id")
   async remove(@Param("id", ParseIntPipe) id: number, @Req() req: Request) {
     await this.questionService.remove(id, req["user"]);
-    return { success: true, message: "Savol o'chirildi" };
+    return { success: true, message: "Question deleted successfully!" };
   }
 }
