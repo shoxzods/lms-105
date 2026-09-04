@@ -3,30 +3,34 @@ import { Transform } from "class-transformer";
 import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreateQuestionDto {
-  @ApiProperty({ example: 1, description: "Kurs ID-si" })
-  @Transform(({ value }) =>
-    value !== undefined && value !== null && value !== ""
-      ? Number(value)
-      : value,
-  )
-  courseId!: number;
+  @ApiPropertyOptional({ example: 1, description: "Kurs ID-si" })
+  @IsOptional()
+  @Transform(({ value, obj }) => {
+    const val = value ?? obj?.course_id ?? obj?.courseId;
+    return val !== undefined && val !== null && val !== ""
+      ? Number(val)
+      : undefined;
+  })
+  courseId?: number;
 
   @ApiPropertyOptional({ example: 1, description: "Bo'lim ID-si" })
   @IsOptional()
-  @Transform(({ value }) =>
-    value !== undefined && value !== null && value !== ""
-      ? Number(value)
-      : undefined,
-  )
+  @Transform(({ value, obj }) => {
+    const val = value ?? obj?.section_id ?? obj?.sectionId;
+    return val !== undefined && val !== null && val !== ""
+      ? Number(val)
+      : undefined;
+  })
   sectionId?: number;
 
   @ApiPropertyOptional({ example: 1, description: "Dars ID-si" })
   @IsOptional()
-  @Transform(({ value }) =>
-    value !== undefined && value !== null && value !== ""
-      ? Number(value)
-      : undefined,
-  )
+  @Transform(({ value, obj }) => {
+    const val = value ?? obj?.lesson_id ?? obj?.lessonId;
+    return val !== undefined && val !== null && val !== ""
+      ? Number(val)
+      : undefined;
+  })
   lessonId?: number;
 
   @ApiProperty({

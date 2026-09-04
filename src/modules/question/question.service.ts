@@ -42,11 +42,45 @@ export class QuestionService {
   ) {}
 
   async create(userId: number, dto: CreateQuestionDto, fileName?: string) {
-    const rawCourseId = dto.courseId ?? (dto as any).course_id;
-    const courseId = Number(rawCourseId);
+    let courseId = Number(dto.courseId ?? (dto as any).course_id);
 
+    const rawLessonId = dto.lessonId ?? (dto as any).lesson_id;
+    const lessonIdNum = rawLessonId ? Number(rawLessonId) : null;
+
+    const rawSectionId = dto.sectionId ?? (dto as any).section_id;
+    const sectionIdNum = rawSectionId ? Number(rawSectionId) : null;
+
+    // Agar courseId to'g'ridan-to'g'ri berilmagan bo'lsa, lessonId orqali topamiz:
+    if ((!courseId || isNaN(courseId)) && lessonIdNum && !isNaN(lessonIdNum)) {
+      const lesson = await this.prisma.lessons.findUnique({
+        where: { id: lessonIdNum },
+        include: { sections: true },
+      });
+      if (lesson?.sections?.courseId) {
+        courseId = lesson.sections.courseId;
+      }
+    }
+
+    // Agar courseId hamon topilmagan bo'lsa, sectionId orqali topamiz:
+    if ((!courseId || isNaN(courseId)) && sectionIdNum && !isNaN(sectionIdNum)) {
+      const section = await this.prisma.sections.findUnique({
+        where: { id: sectionIdNum },
+      });
+      if (section?.courseId) {
+        courseId = section.courseId;
+      }
+    }
+
+    // Agar birorta ham kurs ID aniqlanmasa:
     if (!courseId || isNaN(courseId)) {
-      throw new BadRequestException("Kurs ID-si noto'g'ri yoki kiritilmagan");
+      const firstCourse = await this.prisma.courses.findFirst({
+        select: { id: true },
+      });
+      if (firstCourse) {
+        courseId = firstCourse.id;
+      } else {
+        throw new BadRequestException("Kurs ID-si noto'g'ri yoki kiritilmagan");
+      }
     }
 
     const course = await this.prisma.courses.findUnique({
@@ -57,18 +91,16 @@ export class QuestionService {
       throw new NotFoundException("Kurs topilmadi");
     }
 
-    const rawSectionId = dto.sectionId ?? (dto as any).section_id;
-    const sectionId = rawSectionId ? Number(rawSectionId) : null;
-
-    const rawLessonId = dto.lessonId ?? (dto as any).lesson_id;
-    const lessonId = rawLessonId ? Number(rawLessonId) : null;
+    const sectionId =
+      sectionIdNum && !isNaN(sectionIdNum) ? sectionIdNum : null;
+    const lessonId = lessonIdNum && !isNaN(lessonIdNum) ? lessonIdNum : null;
 
     return this.prisma.question.create({
       data: {
         userId,
         courseId,
-        sectionId: sectionId && !isNaN(sectionId) ? sectionId : null,
-        lessonId: lessonId && !isNaN(lessonId) ? lessonId : null,
+        sectionId,
+        lessonId,
         question: dto.question,
         file: fileName ?? null,
         status: QuestionStatus.PENDING,
