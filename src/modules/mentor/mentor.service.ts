@@ -256,7 +256,9 @@ export class MentorService {
     currentUser: CurrentUserPayload,
     query: { page?: number; limit?: number; search?: string },
   ) {
-    const { page = 1, limit = 10, search } = query;
+    const page = Math.max(1, Number(query.page) || 1);
+    const limit = Math.max(1, Number(query.limit) || 10);
+    const search = query.search;
     const skip = (page - 1) * limit;
 
     // Mentorning MentorProfile.id sini topamiz
@@ -296,9 +298,9 @@ export class MentorService {
 
     if (search) {
       where.OR = [
-        { full_name: { contains: search, mode: 'insensitive' } },
+        { full_name: { contains: search, mode: "insensitive" } },
         { phone: { contains: search } },
-        { email: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: "insensitive" } },
       ];
     }
 
@@ -307,7 +309,7 @@ export class MentorService {
         where,
         skip,
         take: limit,
-        orderBy: { create_at: 'desc' },
+        orderBy: { create_at: "desc" },
         select: {
           id: true,
           full_name: true,
@@ -318,10 +320,7 @@ export class MentorService {
           status: true,
           create_at: true,
           _count: { select: { purchasedCourses: true } },
-          purchasedCourses: {
-            where: { courseId: { in: courseIds } },
-            select: { status: true, courses: { select: { id: true, name: true } } },
-          },
+          purchasedCourses: { select: { status: true } },
         },
       }),
       this.prisma.user.count({ where }),
@@ -338,7 +337,9 @@ export class MentorService {
     currentUser: CurrentUserPayload,
     query: { page?: number; limit?: number; search?: string },
   ) {
-    const { page = 1, limit = 10, search } = query;
+    const page = Math.max(1, Number(query.page) || 1);
+    const limit = Math.max(1, Number(query.limit) || 10);
+    const search = query.search;
     const skip = (page - 1) * limit;
 
     // Mentorning kurslarini topamiz
@@ -377,9 +378,9 @@ export class MentorService {
 
     if (search) {
       where.OR = [
-        { full_name: { contains: search, mode: 'insensitive' } },
+        { full_name: { contains: search, mode: "insensitive" } },
         { phone: { contains: search } },
-        { email: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: "insensitive" } },
       ];
     }
 
@@ -388,7 +389,7 @@ export class MentorService {
         where,
         skip,
         take: limit,
-        orderBy: { create_at: 'desc' },
+        orderBy: { create_at: "desc" },
         select: {
           id: true,
           full_name: true,

@@ -99,7 +99,7 @@ export class MentorController {
   @Get("my-students")
   myStudents(
     @CurrentUser() user: CurrentUserPayload,
-    @Query() query: { page?: number; limit?: number; search?: string },
+    @Query() query: QueryMentorDto,
   ) {
     return this.mentorService.myStudents(user, query);
   }
@@ -112,7 +112,7 @@ export class MentorController {
   @Get("my-assistants")
   myAssistants(
     @CurrentUser() user: CurrentUserPayload,
-    @Query() query: { page?: number; limit?: number; search?: string },
+    @Query() query: QueryMentorDto,
   ) {
     return this.mentorService.myAssistants(user, query);
   }
