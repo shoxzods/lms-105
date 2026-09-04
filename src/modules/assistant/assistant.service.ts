@@ -133,7 +133,6 @@ export class AssistantService {
 
     if (!exist || exist.role !== UserRole.ASSISTANT) {
       await this.files.remove("images", filename);
-
       throw new NotFoundException(`Assistant not found with this id=${id}`);
     }
 
@@ -157,15 +156,52 @@ export class AssistantService {
 
       if (duplicate) {
         await this.files.remove("images", filename);
-
         throw new ConflictException("Phone or email already in use");
       }
     }
 
+    // courseId ni alohida olib, User jadvalini yangilaymiz
+    const { courseId, ...userData } = payload;
+
+    if (courseId !== undefined) {
+      // courseId berilgan bo'lsa — kurs mavjudligini tekshiramiz
+      if (courseId) {
+        const course = await this.prisma.courses.findUnique({
+          where: { id: courseId },
+        });
+
+        if (!course) {
+          await this.files.remove("images", filename);
+          throw new NotFoundException(
+            `Course not found with this id=${courseId}`,
+          );
+        }
+
+        // Eski kursdan assistantId ni olib tashlaymiz (boshqa kurs bo'lsa)
+        await this.prisma.courses.updateMany({
+          where: { assistantId: id, id: { not: courseId } },
+          data: { assistantId: null },
+        });
+
+        // Yangi kursga assistantId o'rnatamiz
+        await this.prisma.courses.update({
+          where: { id: courseId },
+          data: { assistantId: id },
+        });
+      } else {
+        // courseId = 0 yoki null berilsa — barcha kurslardan olib tashlaymiz
+        await this.prisma.courses.updateMany({
+          where: { assistantId: id },
+          data: { assistantId: null },
+        });
+      }
+    }
+
+    // Foydalanuvchi ma'lumotlarini yangilaymiz
     const assistant = await this.prisma.user.update({
       where: { id },
       data: {
-        ...payload,
+        ...userData,
         ...(filename && { file: filename }),
       },
       select: assistantSelect,
@@ -177,10 +213,11 @@ export class AssistantService {
 
     return {
       success: true,
-      message: "Assistant update successfully!",
+      message: "Assistant updated successfully!",
       data: assistant,
     };
   }
+
 
   async remove(id: number) {
     const exist = await this.prisma.user.findUnique({ where: { id } });
