@@ -19,6 +19,7 @@ import {
   ApiBody,
   ApiConsumes,
   ApiOperation,
+  ApiTags,
 } from "@nestjs/swagger";
 import { diskStorage } from "multer";
 import { extname } from "path";
@@ -33,24 +34,30 @@ import { UserRole } from "@prisma/client";
 import { CreateHomeworkDto } from "./dto/create-homework.dto";
 import { QueryHomeworkDto } from "./dto/query-homework.dto";
 import { UpdateHomeworkDto } from "./dto/update-homework.dto";
+import { SubmitHomeworkDto } from "./dto/submit-homework.dto";
+import { GradeSubmissionDto } from "./dto/grade-submission.dto";
+import { QuerySubmissionDto } from "./dto/query-submission.dto";
 
 const homeworkUpload = FileInterceptor("file", {
   storage: diskStorage({
     destination: "./src/uploads/files",
-    filename: (req, file, cb) => {
+    filename: (_req, file, cb) => {
       const unique = Date.now() + "-" + Math.round(Math.random() * 1e9);
       cb(null, unique + extname(file.originalname));
     },
   }),
-  limits: { fileSize: 20 * 1024 * 1024 },
+  limits: { fileSize: 30 * 1024 * 1024 },
   fileFilter: materialFileFilter,
 });
 
+@ApiTags("Homeworks")
 @ApiBearerAuth()
-@UseGuards(AuthGuard, RoleGuard, CourseAccessGuard)
+@UseGuards(AuthGuard, RoleGuard)
 @Controller("homeworks")
 export class HomeworksController {
   constructor(private readonly homeworksService: HomeworksService) {}
+
+  /* ==================== Homework Management (O'qituvchi) ==================== */
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
   @ApiOperation({ summary: "Vazifa berish" })
@@ -80,15 +87,87 @@ export class HomeworksController {
   }
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
-  @CourseAccess("lesson")
   @ApiOperation({ summary: "Vazifa ro'yhati" })
   @Get()
   findAll(@Query() query: QueryHomeworkDto, @Req() req: Request) {
     return this.homeworksService.findAll(query, req["user"]);
   }
 
+  /* ==================== Student Submission Endpoints ==================== */
+
+  @ApiOperation({ summary: "Talaba vazifa topshirishi (Submit homework)" })
+  @ApiConsumes("multipart/form-data")
+  @UseInterceptors(homeworkUpload)
+  @Post("submit")
+  submit(
+    @Req() req: Request,
+    @Body() payload: SubmitHomeworkDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const userId = req["user"].id;
+    return this.homeworksService.submit(userId, payload, file?.filename);
+  }
+
+  @ApiOperation({ summary: "Talabaning o'z topshirgan vazifalari" })
+  @Get("my-submissions")
+  findMySubmissions(
+    @Req() req: Request,
+    @Query("lessonId") lessonId?: number,
+  ) {
+    const userId = req["user"].id;
+    return this.homeworksService.findMySubmissions(userId, lessonId);
+  }
+
+  /* ==================== Teacher / Admin Submissions Review & Grading ==================== */
+
+  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.ASSISTANT)
+  @ApiOperation({ summary: "Topshirilgan vazifalar ro'yxati (O'qituvchi/Admin)" })
+  @Get("submissions")
+  findSubmissions(@Req() req: Request, @Query() query: QuerySubmissionDto) {
+    return this.homeworksService.findSubmissions(req["user"], query);
+  }
+
+  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.ASSISTANT, UserRole.STUDENT)
+  @ApiOperation({ summary: "Bitta topshirilgan vazifani olish" })
+  @Get("submissions/:id")
+  findOneSubmission(
+    @Param("id", ParseIntPipe) id: number,
+    @Req() req: Request,
+  ) {
+    return this.homeworksService.findOneSubmission(id, req["user"]);
+  }
+
+  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.ASSISTANT)
+  @ApiOperation({ summary: "Vazifani baholash (Grade submission)" })
+  @ApiConsumes("multipart/form-data")
+  @UseInterceptors(homeworkUpload)
+  @Post("submissions/:id/grade")
+  gradeSubmission(
+    @Param("id", ParseIntPipe) id: number,
+    @Req() req: Request,
+    @Body() payload: GradeSubmissionDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    return this.homeworksService.gradeSubmission(
+      id,
+      req["user"],
+      payload,
+      file?.filename,
+    );
+  }
+
+  @ApiOperation({ summary: "Topshirilgan vazifani o'chirish" })
+  @Delete("submissions/:id")
+  removeSubmission(
+    @Param("id", ParseIntPipe) id: number,
+    @Req() req: Request,
+  ) {
+    return this.homeworksService.removeSubmission(id, req["user"]);
+  }
+
+  /* ==================== Single Homework Routes ==================== */
+
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
-  @CourseAccess("homework")
   @ApiOperation({ summary: "Bitta vazifa" })
   @Get(":id")
   findOne(@Param("id", ParseIntPipe) id: number) {
@@ -98,16 +177,6 @@ export class HomeworksController {
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
   @ApiOperation({ summary: "Vazifani tahrirlash" })
   @ApiConsumes("multipart/form-data")
-  @ApiBody({
-    schema: {
-      type: "object",
-      properties: {
-        description: { type: "string" },
-        lessonId: { type: "number" },
-        file: { type: "string", format: "binary" },
-      },
-    },
-  })
   @Patch(":id")
   @UseInterceptors(homeworkUpload)
   update(
@@ -116,7 +185,12 @@ export class HomeworksController {
     @Req() req: Request,
     @UploadedFile() file?: Express.Multer.File,
   ) {
-    return this.homeworksService.update(id, payload, req["user"], file?.filename);
+    return this.homeworksService.update(
+      id,
+      payload,
+      req["user"],
+      file?.filename,
+    );
   }
 
   @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
