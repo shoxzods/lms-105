@@ -152,8 +152,15 @@ export class QuestionService {
 
     // Role-based scoping
     if (actor.role === UserRole.TEACHER) {
-      const mentorProfileId = await this.owner.mentorProfileId(actor.id);
-      where.course = { mentorId: mentorProfileId };
+      const profile = await this.prisma.mentorProfile.findFirst({
+        where: { userId: actor.id },
+        select: { id: true },
+      });
+      if (profile) {
+        where.course = { mentorId: profile.id };
+      } else {
+        where.id = -1;
+      }
     } else if (actor.role === UserRole.ASSISTANT) {
       where.course = { assistantId: actor.id };
     } else if (actor.role === UserRole.STUDENT) {

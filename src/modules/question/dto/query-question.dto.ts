@@ -16,6 +16,7 @@ export class QueryQuestionDto {
 
   @ApiPropertyOptional({ description: "Qidiruv (o'quvchi ismi yoki savol/javob matni bo'yicha)" })
   @IsOptional()
+  @Transform(({ value }) => (value === "" || value === "undefined" ? undefined : value))
   @IsString()
   search?: string;
 
@@ -26,16 +27,19 @@ export class QueryQuestionDto {
 
   @ApiPropertyOptional({ enum: QuestionStatus, description: "Holat (PENDING | ANSWERED)" })
   @IsOptional()
+  @Transform(({ value }) => (value === "" || value === "undefined" ? undefined : value))
   @IsEnum(QuestionStatus)
   status?: QuestionStatus;
 
   @ApiPropertyOptional({ description: "Boshlanish sanasi (YYYY-MM-DD)" })
   @IsOptional()
+  @Transform(({ value }) => (value === "" || value === "undefined" ? undefined : value))
   @IsString()
   from?: string;
 
   @ApiPropertyOptional({ description: "Tugash sanasi (YYYY-MM-DD)" })
   @IsOptional()
+  @Transform(({ value }) => (value === "" || value === "undefined" ? undefined : value))
   @IsString()
   to?: string;
 }
