@@ -45,14 +45,14 @@ export class PaymentsController {
     return this.paymentsService.findMy(userId);
   }
 
-  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
-  @ApiOperation({ summary: "Barcha to'lovlar" })
+  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
+  @ApiOperation({ summary: "Barcha to'lovlar (Admin/Teacher)" })
   @Get()
-  findAll(@Query() query: QueryPaymentDto) {
-    return this.paymentsService.findAll(query);
+  findAll(@Query() query: QueryPaymentDto, @Req() req: Request) {
+    return this.paymentsService.findAll(query, req["user"]);
   }
 
-  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
+  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
   @ApiOperation({ summary: "To'lovni tasdiqlash yoki rad etish" })
   @Patch(":userId/:courseId")
   updateStatus(

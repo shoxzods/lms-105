@@ -107,8 +107,10 @@ export class PaymentsService {
     };
   }
 
-  async findAll(query: QueryPaymentDto) {
-    const { page = 1, limit = 10, status, courseId } = query;
+  async findAll(query: QueryPaymentDto, actor?: Actor) {
+    const page = Math.max(1, Number(query.page) || 1);
+    const limit = Math.max(1, Number(query.limit) || 10);
+    const { status, courseId } = query;
     const skip = (page - 1) * limit;
 
     const where: Prisma.PurchasedCourseWhereInput = {};
@@ -119,6 +121,24 @@ export class PaymentsService {
 
     if (courseId) {
       where.courseId = courseId;
+    }
+
+    // Teacher bo'lsa — faqat o'z kurslariga tegishli to'lovlarni filtrlaydi
+    if (actor?.role === UserRole.TEACHER) {
+      const profile = await this.prisma.mentorProfile.findFirst({
+        where: { userId: actor.id },
+        select: { id: true },
+      });
+
+      if (!profile) {
+        return {
+          success: true,
+          data: [],
+          meta: { total: 0, page, limit, totalPages: 0 },
+        };
+      }
+
+      where.courses = { mentorId: profile.id };
     }
 
     const [payments, total] = await this.prisma.$transaction([
