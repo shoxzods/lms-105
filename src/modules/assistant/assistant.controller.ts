@@ -62,9 +62,9 @@ export class AssistantController {
   ) {}
 
   @UseGuards(AuthGuard, RoleGuard)
-  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
+  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
   @ApiOperation({
-    summary: `${UserRole.SUPERADMIN}, ${UserRole.ADMIN} - assistent qo'shish`,
+    summary: `${UserRole.SUPERADMIN}, ${UserRole.ADMIN}, ${UserRole.TEACHER} - assistent qo'shish`,
   })
   @ApiConsumes("multipart/form-data")
   @ApiBody({
@@ -131,7 +131,7 @@ export class AssistantController {
   }
 
   @UseGuards(AuthGuard, RoleGuard)
-  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
+  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
   @ApiOperation({
     summary: "Bitta assistent",
   })
@@ -143,7 +143,7 @@ export class AssistantController {
   }
 
   @UseGuards(AuthGuard, RoleGuard)
-  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN)
+  @Roles(UserRole.SUPERADMIN, UserRole.ADMIN, UserRole.TEACHER)
   @ApiOperation({
     summary: "Assistentni tahrirlash",
   })
