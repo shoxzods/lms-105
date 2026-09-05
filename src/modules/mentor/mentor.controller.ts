@@ -204,7 +204,7 @@ export class MentorController {
     }
 
     @ApiOperation({summary:UserRoles.TEACHER})
-    @Roles(UserRoles.TEACHER)
+    @Roles(UserRoles.TEACHER) 
     @UseGuards(AuthGuard , RoleGuard)
     @Post("me/course/:courseId/assistant/:assistantId")
     async addAssistantToMentorCourse(@Req() req:{user:{id:number}} , @Param("courseId") courseId:number , @Param("assistantId") assistantId:number ) {

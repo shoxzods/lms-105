@@ -25,9 +25,9 @@ import { LessonsModule } from './modules/lessons/lessons.module';
       rootPath:join(process.cwd() , "src" , "uploads"),
       serveRoot:"/uploads"
     }),
-    PrismaModule, 
+    PrismaModule,
     SeederModule, 
     AuthModule, UsersModule, AdminsModule, MentorModule, AssistentModule, StudentsModule, CoursesModule, CourseCategoriesModule, SectionsModule, LessonsModule
 ]})
 
-export class AppModule {} 
+export class AppModule {}
